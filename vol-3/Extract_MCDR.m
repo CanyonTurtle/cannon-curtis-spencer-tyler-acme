@@ -1,5 +1,7 @@
 %fnames = ["test_01_white_noise_0_fwd","test_02_white_noise_45_left","test_03_white_noise_90_left","test_04_engine_noise_no_talking","test_06_engine_noise_talking"];
 % Get the current directory
+
+cd("C:\Repositories\cannon-curtis-spencer-tyler-acme\vol-3\Data")
 currentDir = pwd;
 
 % List all files in the current directory
@@ -9,14 +11,17 @@ files = dir(currentDir);
 filenames = {files(~[files.isdir]).name};
 
 
+% MCDR2CSV("TEST.mcdr")
 for i = 1:length(filenames)
     %Loops through all files and saves it as a .mat file
     file = filenames(i);
     file = file{1};
     if file(length(file)-3:length(file)) == 'mcdr'
-        MCDR2mat(file);
+        % MCDR2mat(file);
+        MCDR2CSV(file)
     end
 end
+cd("C:\Repositories\cannon-curtis-spencer-tyler-acme\vol-3")
 
 % Reads an MCDR file and returns all fields. v1.1
 function [label,data,timestamp,fs,micPositions,channel_ID_string]=readMCDR(filename)
@@ -63,10 +68,38 @@ function MCDR2mat(fnameMCDR)
 end
 
 %Reads the MCDR file and saves it as a .mat file with just data
-function MCDR2CSV(filename)
+function MCDR2CSV(fnameMCDR)
+    %Load in the mcdr file
+    filename = convertStringsToChars(fnameMCDR);
+    filename = filename(1:length(filename)-5);
     %fnameMCDR = strcat(filename,".mcdr");
     [label,data,timestamp,fs,micPositions,channel_ID] = readMCDR(fnameMCDR);
+    
+    
+    folder_name = filename;
+    folder_name
+    if exist(folder_name, 'dir') ~= 7
+        status = mkdir(folder_name);
+        cd(folder_name)
 
-    fname_to_write = strcat(filename,"_", string(fs),".csv");
-    writematrix(data,fname_to_write);
+        %Make the positions CSV
+        header = ["","X_meters","Y_meters"];
+        left_col = 0:length(micPositions)-1;
+        left_col = reshape(left_col,[length(micPositions),1]);
+        micPositions = horzcat(left_col,micPositions);
+        micPositions = vertcat(header,micPositions);
+        writematrix(micPositions,"positions.csv");
+
+        %make the pressures CSV
+        header = [""];
+        for i = 0:length(micPositions)-2
+            name = ['mic_',int2str(i),'_pressure_Pa'];
+            header = [header,name];
+        end
+        left_col = 0:length(data)-1;
+        left_col = reshape(left_col,[length(data),1]);
+        data = horzcat(left_col,data);
+        data = vertcat(header,data);
+        writematrix(data,"pressures.csv")
+    end
 end
