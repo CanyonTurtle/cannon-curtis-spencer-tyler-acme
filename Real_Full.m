@@ -43,7 +43,7 @@ for b=1:nBlocks
     for i=1:size(block,2)-1
         for j=i+1:size(block,2,1)
             np=np+1;
-            % GCC PHAT (Algorithm 2 Step 1)
+            % GCC PHAT (Alg orithm 2 Step 1)
             G1=fft(block(:,i));
             G2=fft(block(:,j));
             GPHAT=(G1.*conj(G2))./abs((G1.*conj(G2))); % This is the coherence metric being calculated via dark magic, then normalized
