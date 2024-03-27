@@ -2,10 +2,12 @@ clear; clc;
 %% Read in data <These will need to be updated on each computer>
 % [label,data,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Data\CAT_Data\spring2024\testRecording_45_deg_left_of_fwd_2.mcdr");
 % [label,data,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Data\CAT_Data\23_lowIdle_5m.mcdr");
-[label,data1,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Data\CAT_Data\spring2024\test_01_white_noise_0_fwd.mcdr");
-[label,data2,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Data\CAT_Data\spring2024\test_03_white_noise_90_left.mcdr");
-[label,data3,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Data\CAT_Data\spring2024\test_02_white_noise_45_left.mcdr");
-[label,data,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Demo2024\testRecording.mcdr");
+% [label,data1,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Data\CAT_Data\spring2024\test_01_white_noise_0_fwd.mcdr");
+% [label,data2,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Data\CAT_Data\spring2024\test_03_white_noise_90_left.mcdr");
+% [label,data3,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Data\CAT_Data\spring2024\test_02_white_noise_45_left.mcdr");
+% [label,data,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Demo2024\testRecording.mcdr");
+file = "C:\Repositories\cannon-curtis-spencer-tyler-acme\vol-3\Data\test_01_white_noise_0_fwd.mcdr";
+[label,data,timestamp,fs,micPositions,channel_ID_string]=readMCDR(file);
 
 % data=[data1; data2; data3]; % Concatenate data (if you want to see multiple results at once)
 
@@ -21,7 +23,11 @@ clearvars -except Signals fs micPositions nMics data
 
 %% Parameters
 frameSize=512; % How many samples are processed at a time
+% SmoothingFactor=0;
 SmoothingFactor=0.93; % This is used by the leaky filter
+win = true;
+hann_window = repmat(hann(frameSize),1,nMics);
+amplitudes = [];
 
 %% Precalcs
 A_ind=getAngularIndex_GPHAT(micPositions,fs,frameSize); % A_ind handles the conversion from time domain to spatial domain
@@ -35,8 +41,10 @@ nBlocks=floor(size(Signals,1)/frameSize);
 
 for b=1:nBlocks
     block=Signals((b-1)*frameSize+1:b*frameSize,:); % Get a block of data
+    if win
+        block = block.*hann_window;
+    end
     dblock=[zeros(1,nMics); diff(block)]; % Differentiate (d/dt)
-
     DOA_inst=zeros(360,1); % Zero instantaneous DOA estimate each cycle
     DOA_inst_XC=DOA_inst;
     np=0; % micpair index
@@ -46,9 +54,12 @@ for b=1:nBlocks
             % GCC PHAT (Alg orithm 2 Step 1)
             G1=fft(block(:,i));
             G2=fft(block(:,j));
+            % amplitude = max(abs((G1.*conj(G2))));
+            % amplitudes = [amplitudes,amplitude];
             GPHAT=(G1.*conj(G2))./abs((G1.*conj(G2))); % This is the coherence metric being calculated via dark magic, then normalized
             GPHAT(isnan(GPHAT))=0; % Just in case
-            GphatSmooth(:,np)=GphatSmooth(:,np)*SmoothingFactor+GPHAT; % This is a leaky filter
+            GphatSmooth(:,np)=GphatSmooth(:,np)*SmoothingFactor+GPHAT;
+            %GphatSmooth(:,np)=GphatSmooth(:,np)*SmoothingFactor+GPHAT*amplitude; % This is a leaky filter, 
             R=ifft(GphatSmooth(:,np));
             R=[R(length(R)/2+1:end); R(1:length(R)/2)]; % This is a re-indexing to arrange R from -x to x, rather than 0 to x, then -x to -1
             
@@ -71,44 +82,47 @@ for b=1:nBlocks
 
 end
 
-%%%%% IGNORE THIS STUFF %%%%%
-lgs=-length(R)/2:length(R)/2-1;
-%% Control
-A_ind_C=getAngularIndex_GPHAT(micPositions,fs,size(Signals,1)*2);
-DOAC=zeros(360,1);
-np=0;
-for i=1:size(block,2)-1
-    for j=i+1:size(block,2,1)
-        np=np+1;
-        [~,R_control,lgs_control]=gccphat(Signals(:,i),Signals(:,j));
-        DOAC=DOAC+R_control(A_ind_C(:,np));
-    end
-end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Save the angle estimates:
+writematrix(est,"C:\Repositories\cannon-curtis-spencer-tyler-acme\vol-3\Data\test_01_white_noise_0_fwd.csv")
 
-%% Plot
-close all
+% %%%%% IGNORE THIS STUFF %%%%%
+% lgs=-length(R)/2:length(R)/2-1;
+% %% Control
+% A_ind_C=getAngularIndex_GPHAT(micPositions,fs,size(Signals,1)*2);
+% DOAC=zeros(360,1);
+% np=0;
+% for i=1:size(block,2)-1
+%     for j=i+1:size(block,2,1)
+%         np=np+1;
+%         [~,R_control,lgs_control]=gccphat(Signals(:,i),Signals(:,j));
+%         DOAC=DOAC+R_control(A_ind_C(:,np));
+%     end
+% end
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-subplot(2,1,1)
-surf(DOA_Surf_xc')
-shading interp
-colormap jet
-view(0,90)
-xlim([1 nBlocks]); ylim([1 360]);
-title('Differential XC')
-ylabel('Degrees');
-
-subplot(2,1,2)
-surf(DOA_Surf')
-shading interp
-colormap jet
-view(0,90)
-xlim([1 nBlocks]); ylim([1 360]);
-title('GCC PHAT')
-ylabel('Degrees'); xlabel('Block Number')
-
-sgtitle('Comparison of Continuous Metrics')
-set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.1, 0.1, 0.65, 0.75]);
+% %% Plot
+% close all
+% 
+% subplot(2,1,1)
+% surf(DOA_Surf_xc')
+% shading interp
+% colormap jet
+% view(0,90)
+% xlim([1 nBlocks]); ylim([1 360]);
+% title('Differential XC')
+% ylabel('Degrees');
+% 
+% subplot(2,1,2)
+% surf(DOA_Surf')
+% shading interp
+% colormap jet
+% view(0,90)
+% xlim([1 nBlocks]); ylim([1 360]);
+% title('GCC PHAT')
+% ylabel('Degrees'); xlabel('Block Number')
+% 
+% sgtitle('Comparison of Continuous Metrics')
+% set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.1, 0.1, 0.65, 0.75]);
 
 % plot(lgs_control,R_control/max(abs(R_control)))
 % hold on
@@ -150,4 +164,37 @@ newXC=oldXC;
 for n=1:size(oldXC,2)
     newXC(unique(angularIndex(anglesToMask,n)),n)=0;
 end
+end
+
+% Reads an MCDR file and returns all fields. v1.1
+function [label,data,timestamp,fs,micPositions,channel_ID_string]=readMCDR(filename)
+    fileID = fopen(filename,'r');
+    if fileID<0
+        error(sprintf("Cannot find file: %s",filename));
+    end
+    v1=fread(fileID,1,"uint8");
+    v2=fread(fileID,1,"uint8");
+    L=fread(fileID,1,"uint8");
+    T=fread(fileID,1,"uint8");
+    label=string(fread(fileID,L,'char=>char')');
+    timestamp=string(fread(fileID,T,'char=>char')');
+    fs=fread(fileID,1,"uint32");
+    N=fread(fileID,1,"uint8");
+    micPositions=fread(fileID,[N 2],"float32");
+    channel_ID_string=fread(fileID,N,"char=>char")';
+    NS=fread(fileID,1,"uint32");
+    P=fread(fileID,1,"uint8");
+    if P==4
+        data=fread(fileID,[NS N],"float32");
+    elseif P==8
+        data=fread(fileID,[NS N],"double");
+    else
+        error("invalid precision for v1.1 MCDR file.")
+    end
+    fclose(fileID);
+end
+
+function [d,a]=distang(p1,p2)
+d=sqrt((p1(1)-p2(1))^2+(p1(2)-p2(2))^2);
+a=atan2(p2(2)-p1(2),p2(1)-p1(1));
 end
