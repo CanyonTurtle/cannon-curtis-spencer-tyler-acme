@@ -131,12 +131,37 @@ the correct sign so the Kalman filter can function correctly.
 %% Insert some pictures of the angle adjustment and add the algorithm 
 
 \subsection{Particle Filter}
+The second method we employed was another type of Bayesian filter, the particle filter \cite{Particle}. The particle filter employs a large number of possible current states, each referred to 
+as a “particle”. Each particle has an associated weight, interpreted as the probability that particle accurately reflects the hidden state, with all weights summing to 1. As the source can possibly 
+come in at any angle, we initialize the particles with uniformly distributed states and weights. At each time step, the filter propagates all of the particles forward in time according to the state space 
+model, including adding state noise in the update. Then, using the data, it updates the weights of each particle by computing the posterior probabilities given data. Finally, it computes the state estimate 
+as the weighted average of the states of all the particles. 
+
+In the update step, the filter computes $P(\theta|\text{data}) \approx P(\text{data}|\theta)P(\theta)$ for each particle. The prior $P(\theta)$ is given by the particle’s previous weight, while $P(\text{data}|\theta)$ is calculated 
+according to the probability distribution defined for the measurement noise. One of the benefits of the particle filter is that, unlike the normal distribution requirement of the Kalman filter, any arbitrary noise 
+distribution may be employed. In this case, we used the Von Mises distribution \textcolor{red}{TODO} [DEFINE,show plot]. This closely approximates a Normal distribution that is “wrapped” around the angle boundary between $0$ and $2\pi$. 
+Thus, no other consideration of angle wrapping must be made for the particle filter. After the posterior weights have been calculated, they are again normalized by their sum so they represent a probability distribution.
 
 TODO graph of Von Mises distribution with explanation of how Kappa parameter 
 correlates to certainty on particle's location.
 
-TODO explain basis principles of Particle Filter and cite the book
-that Tyler referenced in implementation.
+Particle filters suffer from what is called the "Degeneracy Problem", in which the weights become concentrated in a small number of the total particles. This is solved by resampling, a process in which low probability particles are replaced 
+with higher probability particles. Detailing this problem and its solution is beyond our scope, but we used the TODO [fix format of this] $\text{systematic\_resample}$ function from $\text{filterpy}$ to accomplish resampling.
+
+As the particle filter keeps track of a large number of possible states which are distributed around the circle, it is much more flexible to nonlinear behavior. This is desirable in our case, as the source location may possibly reappear at any 
+location in the state space. Unfortunately, the particle filter performs a similar number of computations for each individual particle as the Kalman filter performs in total. As we are using $\text{NUM\_PARTICLES}$, our particle filter takes $\text{N\_PARTICLES}$ 
+times as long to compute each step.
+
+The Particle filter is defined with the following hyperparameters: 
+\begin{itemize}
+    \item $K1$ defines the analogous variance term for the distribution of the state noise,
+    \item $K2$ defines the same for the measurements noise,
+    \item $\text{N\_particles}$ defines the number of particles the model employs, and
+    \item $\text{N\_eff\_particles}$ defines the minimum number of “effective” particles allowed before particles are resampled.
+\end{itemize}
+
+Similar to the Kalman filter, we tuned the hyperparameters $K1$, $K2$, $\text{N\_particles}$, and $\text{N\_eff\_particles}$ by performing a gridsearch over many different possible values. A filter was constructed for each hyperparameter combination, with its performance 
+tested across several different datasets. We then chose the hyperparameters that produced minimum average angular error over the different datasets. 
 
 \subsection{Leaky Filter}
 

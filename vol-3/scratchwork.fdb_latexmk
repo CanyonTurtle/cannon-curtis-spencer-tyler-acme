@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1711664810 "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" "scratchwork.pdf" "scratchwork" 1711664811 0
-  "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" 1711664810 10708 537a34091529ae96ebda4bad8c7f5c23 ""
+["pdflatex"] 1711666880 "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" "scratchwork.pdf" "scratchwork" 1711666881 0
+  "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" 1711666879 14292 1219ea06a0e86907d19ab19ac992fb79 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/local/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1246382020 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -183,9 +183,9 @@
   "/usr/local/texlive/2023/texmf.cnf" 1700576439 577 1b2b1af17af2508fb20dd85783af4050 ""
   "altered_kalman.pdf" 1711475727 21443 4281821bbbdf4196042639fa1c01599a ""
   "non_altered_kalman.pdf" 1711475725 21446 9f4360549777e8886604ac61a392b748 ""
-  "scratchwork.aux" 1711664811 3434 979176d56da91d08ff7b27c99fe2322f "pdflatex"
-  "scratchwork.out" 1711664811 1626 10f12847c00a7017e38015b057eaef8b "pdflatex"
-  "scratchwork.tex" 1711664810 10708 537a34091529ae96ebda4bad8c7f5c23 ""
+  "scratchwork.aux" 1711666881 3454 a278ca4b4477974f55881d40ab41b619 "pdflatex"
+  "scratchwork.out" 1711666881 1626 10f12847c00a7017e38015b057eaef8b "pdflatex"
+  "scratchwork.tex" 1711666879 14292 1219ea06a0e86907d19ab19ac992fb79 ""
   "temp.pdf" 1702012651 69099 6b9e0f081abfde6a973b14d549e304db ""
   (generated)
   "scratchwork.aux"
