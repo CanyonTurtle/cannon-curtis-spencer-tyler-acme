@@ -106,7 +106,7 @@ See Figure \ref{fig:simple_kalman}.
     \centering
     \includegraphics[width=0.47\textwidth]{non_altered_kalman.pdf}\hfill
     \includegraphics[width=0.47\textwidth]{altered_kalman.pdf}\hfill
-    \caption{The altered and non-altered Kalman Filter}
+    \caption{The non-altered and altered Kalman Filter}
     \label{fig:simple_kalman}
 \end{figure}
 
@@ -127,11 +127,27 @@ See Figure \ref{fig:simple_kalman}.
 
 \subsection{Particle Filter}
 
+TODO graph of Von Mises distribution with explanation of how Kappa parameter 
+correlates to certainty on particle's location.
+
+TODO explain basis principles of Particle Filter and cite the book
+that Tyler referenced in implementation.
+
 \subsection{HMM Model}
 
 \section{Results}
 
+We had success with circular filtering techniques by using Algorithm \ref{alg:kalman} allowed us to use Kalman Filters with circular mechanics.
+
+
 \section{Analysis}
+
+TODO tradeoffs of Particle filter - the compute time 500x longer for 500 particles
+- particle filter can have a more flexible prior because it's already got particles everywhere.
+- particle filter better at nonlinearities bc particles can be reassigned
+
+- Both systems have a mechanism to capture how certain they are about the current state,
+- and both have a way to specify how much we "belive" current measurements
 
 \section{Ethical Considerations}
 Some possible use cases of this project would be so that big machinery can detect an angle of danger where a person might be. 
