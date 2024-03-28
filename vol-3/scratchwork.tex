@@ -69,9 +69,9 @@ source is and is not moving, is and is not present, and measurements that do and
 We have tried several methods to compute the hidden angle measurement. We tried the following methods...
 
 \subsection{State Space Model}
-First we had to set up our continuous state space model. We figured that we needed to have angular velocity 
-in our state space so to do that we do a finite difference approximation where $\theta'_t \approx \frac{\theta - \theta_{t-1}}{\Delta t}$.
-With that we need to save $\theta_{t-1}$ in the state space. This yields the following setup
+First we had to set up our continuous state space model. We needed angular velocity in our state space so to do that we do a finite difference approximation 
+where $\theta'_t \approx \frac{\theta - \theta_{t-1}}{\Delta t}$. Now that we have angular velocity we can use it to make a simple forward Euler step in our state 
+space. With the finite difference we need to save $\theta_{t-1}$ in the state space. This yields the following setup
 \[\mathbf{x}_t = \begin{pmatrix*}[l]
     \theta_t \\
     \theta_{t-1} \\
@@ -93,14 +93,17 @@ H = \begin{pmatrix*}[l]
 \[\mathbf{z}_t = H\mathbf{x}_t + \mathbf{v}_t\].
 
 \subsection{Kalman Filter}
-We implemented an extended version of the Kalman filter \cite{V3} and with stimulated data like done in the lab manuals we were struggling 
-to get the wraparound from angles in the range of \[2\pi - \epsilon \leq \theta \leq 2\pi + \epsilon.\] See figure \ref{fig:simple_kalman}
-to get a visual.
+We implemented the Kalman filter from the Volume 3 Textbook \cite{V3}. To understand how angle measurements worked in the Kalman Filter we tried it with
+stimulated data done in the lab manuals and class. We discovered a problem with the update step in angle wraparound from the angles in the range of 
+\[2\pi - \epsilon \leq \theta \leq 2\pi + \epsilon\] for some $\epsilon \geq 0$. We notices that the more noise we added the larged this $\epsilon$ got. 
+See figure \ref{fig:simple_kalman} to get a visual.
 
-We discovered that the problem was occurring in the update step where \[\mathbf{\tilde{y}}_k = \mathbf{z}_k - H\mathbf{\hat{x}}_{k|k-1}\]
-so we figured out the best way to fix this was to implement Algorithm \ref{alg:kalman} which will alter the angle shift if the difference is close 
-to $2\pi$. We saw great results from this in our stimulated data.
-See Figure \ref{fig:simple_kalman}.
+We discovered that the problem was occurring in the update step where \[\mathbf{\tilde{y}}_k = \mathbf{z}_k - H\mathbf{\hat{x}}_{k|k-1}.\]
+A toy example would be if we are looking at an observed angle $\mathbf{z}_i = 15^{\circ}$ and a predicted angle of $(H\mathbf{x})_i = 355^{\circ}$ 
+then $\mathbf{z}_i - (H\mathbf{x})_i = 15^{\circ} - 355^{\circ} = -340^{\circ}$ and we desire $20^{\circ}$. We could simply do this by noticing that $-340 \equiv 20 \pmod {360}$,
+however, if we said $\mathbf{z}_i=355^{\circ}$ and $(H\mathbf{x})_i = 15^{\circ}$ then $\mathbf{z}_i - (H\mathbf{x})_i = 355^{\circ} - 15^{\circ} = 340^{\circ}$ which isn't what we want.
+We want the Kalman filter to think of this difference as $-20^{\circ}$. The best way to do this was by implementing Algorithm \ref{alg:kalman} which will get us the right differenced needed by 
+the correct sign so the Kalman filter can function correctly. We saw great results from this in our stimulated data. See Figure \ref{fig:simple_kalman}.
 
 \begin{figure}[htp]
     \centering
@@ -115,11 +118,13 @@ See Figure \ref{fig:simple_kalman}.
 \begin{algorithm}
     \caption{Process to Fix Wraparound}\label{alg:kalman}    
     \begin{algorithmic}
-        \If{$\lvert{\mathbf{z_k} - H\mathbf{x_k}}\rvert \geq \pi \;\textbf{and}\; \mathbf{z_k} \leq 0$} 
-            \State $\mathbf{z_k} \gets \mathbf{z_k} + 2\pi$
-        \ElsIf{$\lvert{\mathbf{z_k} - H\mathbf{x_k}}\rvert \geq \pi \;\textbf{and}\; \mathbf{z_k} \geq 0$} 
-            \State $\mathbf{z_k} \gets \mathbf{z_k} - 2\pi$
+        \State $\mathbf{v} \gets \mathbf{z}_k - H\mathbf{x}_k$
+        \If{$\lvert{\mathbf{v}}\rvert \geq \pi \;\textbf{and}\; \mathbf{v}_k \leq 0$} 
+            \State $\mathbf{v} \gets \mathbf{v} + 2\pi$
+        \ElsIf{$\lvert{\mathbf{v}}\rvert \geq \pi \;\textbf{and}\; \mathbf{v}_k \geq 0$} 
+            \State $\mathbf{v} \gets \mathbf{v} - 2\pi$
         \EndIf 
+        \State $\tilde{\mathbf{y}} = \mathbf{v}$ 
         \end{algorithmic}
     \end{algorithm}
 
@@ -161,30 +166,6 @@ This isn't a great a
 
 
 
-\begin{figure}[htp]
-    \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{temp.pdf}
-        \caption{$A_{interp.7}$}
-        \label{fig:interp_degrees_7}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{temp.pdf}
-        \caption{$A_{interp.12}$}
-        \label{fig:interp_degrees_12}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{temp.pdf}
-        \caption{$A_{interp.25}$}
-        \label{fig:interp_degrees_25}
-    \end{subfigure}
-    \caption{Continuizing $A_{discontinuous}$ with various degrees of Barycentric Lagrange Interpolation 
-    at the Chebyshev points. Our ensuing models use the 12-degree interpolation (bottom-left).}
-    \label{fig:interp_degrees}
-\end{figure}
-
 
 
 
@@ -212,14 +193,6 @@ This isn't a great a
 \end{figure}
 
 
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=0.5\textwidth]{temp.pdf}
-    \caption{Timeplot of our ODE system with $A_{discontinuous}$, but using a BVP solver.}
-    \label{fig:discontinuous_alpha_bvp}
-
-\end{figure}
-
 
 
 \begin{figure}[htp]
@@ -233,16 +206,6 @@ This isn't a great a
 \end{figure}
 
 
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=1\textwidth]{temp.pdf}\hfill
-    \includegraphics[width=0.45\textwidth]{temp.pdf}\hfill
-    \includegraphics[width=0.45\textwidth]{temp.pdf}\hfill
-
-    \caption{Simulating our IVP with $A_{interp.12}$ plus some gaussian terms for daily traffic (top), along with the timeplot using IVP (bottom-left) and BVP (bottom-right).
-    our BVP spikes far outside our usual bounds at transitions with daily traffic.}
-    \label{fig:daywise_alpha}
-\end{figure}
 
 
 
