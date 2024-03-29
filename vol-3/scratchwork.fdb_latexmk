@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1711739308 "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" "scratchwork.pdf" "scratchwork" 1711739308 0
-  "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" 1711739306 18082 6da8382b4614710d20076fae252d2c64 ""
+["pdflatex"] 1711739547 "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" "scratchwork.pdf" "scratchwork" 1711739547 0
+  "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" 1711739338 18557 354304f42dc6e1d3475b9e6971e80ce5 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/dejavu/dejavumono_t1-type1.enc" 1380151016 2620 1ef8c8026e6f0fc7a8bfd158c7dfbe38 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -211,11 +211,12 @@
   "/usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1700576512 8213593 12995839a13449441fdac79358a143c8 ""
   "/usr/local/texlive/2023/texmf.cnf" 1700576439 577 1b2b1af17af2508fb20dd85783af4050 ""
   "Pic of Real Mic Array.jpg" 1711733105 1077419 224a6dfdcb79bae457600be65a124c45 ""
+  "actual_paper_graphs/all.pdf" 1711739338 127281 a1ac428c268608760a2022eb9a5c60fa ""
   "altered_kalman.pdf" 1711731545 21435 62e4fa75be031d5cfd6faae6f33b9a99 ""
   "non_altered_kalman.pdf" 1711731545 21427 afd18f78059973032285863896b44be7 ""
-  "scratchwork.aux" 1711739308 3843 6d911662bb58f4f2696d2268484e86fb "pdflatex"
-  "scratchwork.out" 1711739308 1626 32a05c1a71b5f7c1e774654fa2b2fd71 "pdflatex"
-  "scratchwork.tex" 1711739306 18082 6da8382b4614710d20076fae252d2c64 ""
+  "scratchwork.aux" 1711739547 4378 81a3106de0436c202a249dd9804f99bf "pdflatex"
+  "scratchwork.out" 1711739547 1595 71892ea812eb26bab800fe4c0ce16ce3 "pdflatex"
+  "scratchwork.tex" 1711739338 18557 354304f42dc6e1d3475b9e6971e80ce5 ""
   "temp.pdf" 1702012651 69099 6b9e0f081abfde6a973b14d549e304db ""
   (generated)
   "scratchwork.aux"

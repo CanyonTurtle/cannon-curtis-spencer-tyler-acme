@@ -33,18 +33,17 @@
 
 
 \begin{document}
-
 \title{Angle approximation from pressure measurements}
 \author{Cannon Tuttle, Curtis Evans, Spencer Ashton, Tyler Sanders}
 
 %% comment out next command to put today's date after names of group members, or put a desired day in the parethesis
-\date{}
-
-\maketitle
+\date{\today}
 
 \begin{abstract}
     This paper attempts to adapt linear filtering methods to work with angular data in order to predict angle of arrival of human voices. The data used for this project was both simulated and real data. We used various Bayesian filtering techniques on a continuous state space model to optimize angle estimation.
 \end{abstract}
+
+\maketitle
 
 %% First Section
 \section{Problem Statement and Motivation}
@@ -184,12 +183,17 @@ The Particle filter is defined with the following hyperparameters:
 Similar to the Kalman filter, we tuned the hyperparameters \lstinline{K1}, \lstinline{K2}, \lstinline{N_particles}, and \lstinline{N_eff_particles} by performing a gridsearch over many different possible values. A filter was constructed for each hyperparameter combination, with its performance 
 tested across several different datasets. We then chose the hyperparameters that produced minimum average angular error over the different datasets. A similar method was implemented for a robotics research paper as well see \cite{Oops}.
 
-\section{Results}
+\section{Results and Analysis}
 
-We had success with circular filtering techniques by using Algorithm \ref{alg:kalman} allowed us to use Kalman Filters with circular mechanics.
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\textwidth]{actual_paper_graphs/all.pdf}\hfill
+    \caption{All filters, run on all datasets. Each row is a dataset, and each column is a type of filter. The green dots represent observations of the red true angle. The observations alone are filtered to produce the blue estimate angles.}
+    \label{fig:all_filters}
+\end{figure}
 
+We had success filtering across both simulated and real microphone angle data; see Figure \ref{fig:all_filters} for each simulation. by using Algorithm \ref{alg:kalman} allowed us to use Kalman Filters with circular mechanics.
 
-\section{Analysis}
 
 TODO tradeoffs of Particle filter - the compute time 500x longer for 500 particles
 - particle filter can have a more flexible prior because it's already got particles everywhere.
