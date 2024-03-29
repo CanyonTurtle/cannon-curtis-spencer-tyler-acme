@@ -114,17 +114,24 @@ H = \begin{pmatrix*}[l]
 \[\mathbf{z}_t = H\mathbf{x}_t + \mathbf{v}_t\].
 
 \subsection{Kalman Filter}
-We implemented the Kalman filter from the Volume 3 Textbook \cite{V3} and Lab Manual \cite{V3 Lab Manual}. To understand how angle measurements worked in the Kalman Filter we tried it with
-stimulated data done in the lab manuals and class. We discovered a problem with the update step in angle wraparound from the angles in the range of 
-\[2\pi - \epsilon \leq \theta \leq 2\pi + \epsilon\] for some $\epsilon \geq 0$. We notices that the more noise we added the larged this $\epsilon$ got. 
+We have two different approaches for Kalman Filters. Both originated from the Volume 3 Textbook \cite{V3} and Lab Manual \cite{V3 Lab Manual}.
+\subsubsection{Naïve Kalman Filter}
+To understand how angle measurements worked in the Kalman Filter we tried it with
+simulated data done in the lab manuals and class. We discovered a problem with the update step in angle wraparound from the angles in the range of 
+\[2\pi - \epsilon \leq \theta \leq 2\pi + \epsilon\] for some $\epsilon \geq 0$. We noticed that the more noise we added the larged this $\epsilon$ got. 
 See Figure \ref{fig:simple_kalman} to get a visual.
 
 We discovered that the problem was occurring in the update step where \[\mathbf{\tilde{y}}_t = \mathbf{z}_t - H\mathbf{\hat{x}}_{t|t-1}.\]
 A toy example would be if we are looking at an observed angle $\mathbf{z}_i = 15^{\circ}$ and a predicted angle of $(H\mathbf{x})_i = 355^{\circ}$ 
 then $\mathbf{z}_i - (H\mathbf{x})_i = 15^{\circ} - 355^{\circ} = -340^{\circ}$ and we desire $20^{\circ}$. We could simply do this by noticing that $-340 \equiv 20 \pmod {360}$,
 however, if we said $\mathbf{z}_i=355^{\circ}$ and $(H\mathbf{x})_i = 15^{\circ}$ then $\mathbf{z}_i - (H\mathbf{x})_i = 355^{\circ} - 15^{\circ} = 340^{\circ}$ which isn't what we want.
-We want the Kalman filter to think of this difference as $-20^{\circ}$. The best way to do this was by implementing Algorithm \ref{alg:kalman} which will get us the right differenced needed by 
-the correct sign so the Kalman filter can function correctly.
+We want the Kalman filter to think of this difference as $-20^{\circ}$.
+\subsubsection{Circular Kalman Filter}
+We solved this circular issue by taking\newline
+wraparound into account. See Algorithm \ref{alg:kalman}. This algorithm ensures that if a distance
+between two angles crosses the $0^{\circ}$ threshold, both the short way round and the far way are
+considered, and the smaller is chosen. This resulted in an improvement across boundaries, see
+Figure \ref{fig:simple_kalman}.
 
 \begin{figure}[htp]
     \centering
