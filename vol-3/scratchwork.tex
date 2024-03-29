@@ -153,6 +153,14 @@ according to the probability distribution defined for the measurement noise. One
 distribution may be employed. In this case, we used the Von Mises distribution \textcolor{red}{TODO} [DEFINE,show plot]. This closely approximates a Normal distribution that is “wrapped” around the angle boundary between $0$ and $2\pi$. 
 Thus, no other consideration of angle wrapping must be made for the particle filter. After the posterior weights have been calculated, they are again normalized by their sum so they represent a probability distribution.
 
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.47\textwidth]{actual_paper_graphs/particle_filter_example.pdf}\hfill
+    \includegraphics[width=0.47\textwidth]{actual_paper_graphs/von_mises_pdf.pdf}\hfill
+    \caption{On the left, a particle filter example at a given timestep. The particles are colored according to weight, with the heaviest weights clustering around the data angle. On the right, the Von Mises distribution.}
+    \label{fig:particle_filter_stuff}
+\end{figure}
+
 TODO graph of Von Mises distribution with explanation of how Kappa parameter 
 correlates to certainty on particle's location.
 
