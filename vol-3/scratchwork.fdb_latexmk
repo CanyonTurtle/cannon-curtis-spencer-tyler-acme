@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1711737408 "/Users/spencerashton/Documents/Senior Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" "scratchwork.pdf" "scratchwork" 1711737409 0
-  "/Users/spencerashton/Documents/Senior Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" 1711737407 16149 eb4a5bcf91fd03ff46106cb060ef2002 ""
+["pdflatex"] 1711737912 "/Users/spencerashton/Documents/Senior Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" "scratchwork.pdf" "scratchwork" 1711737913 0
+  "/Users/spencerashton/Documents/Senior Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" 1711737912 16154 5307420445729864593da5e4b84e276f ""
   "/usr/local/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/local/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1246382020 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -186,9 +186,9 @@
   "Pic of Real Mic Array.jpg" 1711732796 1077419 224a6dfdcb79bae457600be65a124c45 ""
   "altered_kalman.pdf" 1711731953 21435 62e4fa75be031d5cfd6faae6f33b9a99 ""
   "non_altered_kalman.pdf" 1711731953 21427 afd18f78059973032285863896b44be7 ""
-  "scratchwork.aux" 1711737409 4307 d1f915be796b56f59c67560b5ea1869d "pdflatex"
-  "scratchwork.out" 1711737409 1626 32a05c1a71b5f7c1e774654fa2b2fd71 "pdflatex"
-  "scratchwork.tex" 1711737407 16149 eb4a5bcf91fd03ff46106cb060ef2002 ""
+  "scratchwork.aux" 1711737913 4307 d1f915be796b56f59c67560b5ea1869d "pdflatex"
+  "scratchwork.out" 1711737913 1626 32a05c1a71b5f7c1e774654fa2b2fd71 "pdflatex"
+  "scratchwork.tex" 1711737912 16154 5307420445729864593da5e4b84e276f ""
   "temp.pdf" 1711474821 69099 6b9e0f081abfde6a973b14d549e304db ""
   (generated)
   "scratchwork.aux"
