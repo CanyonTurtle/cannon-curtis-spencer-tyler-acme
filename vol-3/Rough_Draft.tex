@@ -180,8 +180,12 @@ The Particle filter is defined with the following hyperparameters:
     \item \lstinline{N_eff_particles} defines the minimum number of “effective” particles allowed before particles are resampled.
 \end{itemize}
 
-Similar to the Kalman filter, we tuned the hyperparameters \lstinline{K1}, \lstinline{K2}, \lstinline{N_particles}, and \lstinline{N_eff_particles} by performing a gridsearch over many different possible values. A filter was constructed for each hyperparameter combination, with its performance 
-tested across several different datasets. We then chose the hyperparameters that produced minimum average angular error over the different datasets. A similar method was implemented for a robotics research paper as well see \cite{Oops}.
+Similar to the Kalman filter, we tuned the hyperparameters \lstinline{K1},
+\lstinline{K2},\newline \lstinline{N_particles}, and \lstinline{N_eff_particles} by performing a
+gridsearch over many different possible values. A filter was constructed for each hyperparameter
+combination, with its performance tested across several different datasets. We then chose the
+hyperparameters that produced minimum average angular error over the different datasets. A similar
+method was implemented for a robotics research paper as well see \cite{Oops}.
 
 \section{Results and Analysis}
 
