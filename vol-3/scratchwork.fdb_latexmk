@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1711739547 "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" "scratchwork.pdf" "scratchwork" 1711739547 0
-  "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" 1711739338 18557 354304f42dc6e1d3475b9e6971e80ce5 ""
+["pdflatex"] 1711739719 "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" "scratchwork.pdf" "scratchwork" 1711739720 0
+  "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" 1711739718 17576 92a14574cb4be092440dc632f861f199 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/dejavu/dejavumono_t1-type1.enc" 1380151016 2620 1ef8c8026e6f0fc7a8bfd158c7dfbe38 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -47,7 +47,6 @@
   "/usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1248133631 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
   "/usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb" 1248133631 37166 8ab3487cbe3ab49ebce74c29ea2418db ""
   "/usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb" 1248133631 35469 70d41d2b9ea31d5d813066df7c99281c ""
-  "/usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb" 1248133631 36094 798f80770b3b148ceedd006d487db67c ""
   "/usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1248133631 35752 024fb6c41858982481f6968b5fc26508 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb" 1248133631 32734 69e00a6b65cedb993666e42eedb3d48f ""
   "/usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb" 1248133631 32726 0a1aea6fcd6468ee2cf64d891f5c43c8 ""
@@ -214,10 +213,9 @@
   "actual_paper_graphs/all.pdf" 1711739338 127281 a1ac428c268608760a2022eb9a5c60fa ""
   "altered_kalman.pdf" 1711731545 21435 62e4fa75be031d5cfd6faae6f33b9a99 ""
   "non_altered_kalman.pdf" 1711731545 21427 afd18f78059973032285863896b44be7 ""
-  "scratchwork.aux" 1711739547 4378 81a3106de0436c202a249dd9804f99bf "pdflatex"
-  "scratchwork.out" 1711739547 1595 71892ea812eb26bab800fe4c0ce16ce3 "pdflatex"
-  "scratchwork.tex" 1711739338 18557 354304f42dc6e1d3475b9e6971e80ce5 ""
-  "temp.pdf" 1702012651 69099 6b9e0f081abfde6a973b14d549e304db ""
+  "scratchwork.aux" 1711739720 3313 322df64aed9d2bb8ce60dafd90f2dede "pdflatex"
+  "scratchwork.out" 1711739720 1595 c4c68d5bfc77024530c521e2f0b6f30e "pdflatex"
+  "scratchwork.tex" 1711739718 17576 92a14574cb4be092440dc632f861f199 ""
   (generated)
   "scratchwork.aux"
   "scratchwork.log"
