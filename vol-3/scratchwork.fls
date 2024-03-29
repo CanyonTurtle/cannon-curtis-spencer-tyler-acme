@@ -260,8 +260,9 @@ OUTPUT scratchwork.pdf
 INPUT ./scratchwork.out
 INPUT ./scratchwork.out
 OUTPUT scratchwork.out
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmcsc10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmti9.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmcsc10.tfm
 INPUT Pic of Real Mic Array.jpg
 INPUT ./Pic of Real Mic Array.jpg
@@ -304,7 +305,6 @@ INPUT temp.pdf
 INPUT ./temp.pdf
 INPUT temp.pdf
 INPUT ./temp.pdf
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmti9.tfm
 INPUT scratchwork.aux
 INPUT ./scratchwork.out
 INPUT ./scratchwork.out
