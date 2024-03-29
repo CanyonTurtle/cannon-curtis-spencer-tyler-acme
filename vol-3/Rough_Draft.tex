@@ -203,6 +203,25 @@ hyperparameters that produced minimum average angular error over the different d
 method was implemented for a robotics research paper as well see \cite{Oops}.
 
 \section{Results and Analysis}
+Here is a breakdown of the speed and accuracy of each filter (see Figure \ref{fig:all_filters}).
+\subsection{Speed}
+The Kalman filters rivaled the Leaky filter in speed. For instance, the average time for the Leaky filter to run was about 3 or 4 miliseconds, while the Kalman filters ran in about 4 or 5 miliseconds on about 2 miliseconds worth of data. The Particle filter took about 30 times longer than the Kalman filters.
+\subsection{Accuracy}
+In terms of accuracy the results varied per dataset.
+\subsubsection{White Noise}
+The Leaky filter was three times better on the White Noise dataset compared to the Particle filter, which was the second best filter. This is unsurprising since for a constant angle over time, the noise is normally distributed around the angle, which is a fixed mean. Thus, the MLE is a simple average, which is what the Leaky Filter is calculating.
+\subsubsection{Real Engine}
+Quantitatively, the Leaky filter again performed best, but the graphs tell a different story. A large part of this data set is at a fixed angle, but when it does change, the Leaky filter is the slowest to catch up. The other three filters have higher variances, but adjust much faster. The particle filter performed the most robustly, with about half the error of the Kalman filters.
+\subsubsection{Switching}
+This is an artificial dataset created to simulate jumping between angles across $0^{\circ}$. Both the Leaky filter and Naïve Kalman filters performed poorly on this dataset. The Circular Kalman and Particle filters performed much better, with the Particle filter being twice as accurate ($\mathrm{E}=0.453$ vs $\mathrm{E}=.243$).
+\subsubsection{With Jump}
+Here we see the true pitfall of the Leaky filter, not being able to track at all. The other filters all performed better, with the Particle filter again being the most accurate.
+\subsubsection{Wraparound}
+The results of this dataset are the same as the previous dataset.
+\subsubsection{The Best Filter}
+The Circular Kalman and Particle filters both had consistent errors no matter the data set. The real trade off is whether we care more about speed or performance. The Particle filter was around twice as accurate, but it did take about 30 times longer to run. If computational efficiency is important, go with the Circular Kalman filter. If loacation accuracy is important, go with the Particle filter. The improvement in accuracy in the Particle filter is due to the lower variance compared with the Circular Kalman filter, as both responded to changes in angle measurements very quickly.
+
+The researchers shared that due to limitations on reproducing angle-shifted sound accurately, that performance accurate to within approximately $15^{\circ}$ of accuracy is desirable. Of our algorithms, only the Particle filter consistently was within $15^{\circ}$ of accuracy.
 
 \begin{figure}[htp]
     \centering
@@ -210,16 +229,6 @@ method was implemented for a robotics research paper as well see \cite{Oops}.
     \caption{All filters, run on all datasets. Each row is a dataset, and each column is a type of filter. The green dots represent observations of the red true angle. The observations alone are filtered to produce the blue estimate angles.}
     \label{fig:all_filters}
 \end{figure}
-
-We had success filtering across both simulated and real microphone angle data; see Figure \ref{fig:all_filters} for each simulation. Using Algorithm \ref{alg:kalman} allowed us to use Kalman Filters with circular mechanics.
-
-
-TODO tradeoffs of Particle filter - the compute time 500x longer for 500 particles
-- particle filter can have a more flexible prior because it's already got particles everywhere.
-- particle filter better at nonlinearities bc particles can be reassigned
-
-- Both systems have a mechanism to capture how certain they are about the current state,
-- and both have a way to specify how much we "belive" current measurements
 
 \section{Ethical Considerations}
 This project seeks to augment the safety of those outside the machinery by increasing the awareness of the machine operators. However, before deployment, this model must be 
