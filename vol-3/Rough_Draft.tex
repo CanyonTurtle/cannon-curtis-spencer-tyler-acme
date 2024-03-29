@@ -1,7 +1,6 @@
 \documentclass[11pt]{amsart}
 %%% WARNING: Do NOT change the page size, fonts, or margins!  Penalties will apply.
 
-
 \usepackage{graphicx, hyperref}
 \usepackage{amssymb,amsmath,amsthm, mathtools}
 \usepackage{placeins} %enables \FloatBarrier, that prevents floats from going below it.
@@ -10,8 +9,19 @@
 \usepackage{algpseudocode, algorithm}
 \usepackage{tikz}
 \usepackage{physics}
+\usepackage[T1]{fontenc}
+\usepackage{DejaVuSansMono}
 \usetikzlibrary{arrows}
 \usetikzlibrary{tikzmark}
+\usepackage{listings}
+
+% Define style for Python code snippets
+\lstset{
+    language=Python,
+    basicstyle=\small\ttfamily, % Set font size to small
+    frame=single, % Add frame around code snippets
+    showstringspaces=false % Don't show spaces in strings
+}
 
 %%% WARNING: Do NOT change the page size, fonts, or margins!  Penalties will apply.
 %%% WARNING: Do NOT change the page size, fonts, or margins!  Penalties will apply.
@@ -107,9 +117,9 @@ H = \begin{pmatrix*}[l]
 We implemented the Kalman filter from the Volume 3 Textbook \cite{V3} and Lab Manual \cite{V3 Lab Manual}. To understand how angle measurements worked in the Kalman Filter we tried it with
 stimulated data done in the lab manuals and class. We discovered a problem with the update step in angle wraparound from the angles in the range of 
 \[2\pi - \epsilon \leq \theta \leq 2\pi + \epsilon\] for some $\epsilon \geq 0$. We notices that the more noise we added the larged this $\epsilon$ got. 
-See figure \ref{fig:simple_kalman} to get a visual.
+See Figure \ref{fig:simple_kalman} to get a visual.
 
-We discovered that the problem was occurring in the update step where \[\mathbf{\tilde{y}}_k = \mathbf{z}_k - H\mathbf{\hat{x}}_{k|k-1}.\]
+We discovered that the problem was occurring in the update step where \[\mathbf{\tilde{y}}_t = \mathbf{z}_t - H\mathbf{\hat{x}}_{t|t-1}.\]
 A toy example would be if we are looking at an observed angle $\mathbf{z}_i = 15^{\circ}$ and a predicted angle of $(H\mathbf{x})_i = 355^{\circ}$ 
 then $\mathbf{z}_i - (H\mathbf{x})_i = 15^{\circ} - 355^{\circ} = -340^{\circ}$ and we desire $20^{\circ}$. We could simply do this by noticing that $-340 \equiv 20 \pmod {360}$,
 however, if we said $\mathbf{z}_i=355^{\circ}$ and $(H\mathbf{x})_i = 15^{\circ}$ then $\mathbf{z}_i - (H\mathbf{x})_i = 355^{\circ} - 15^{\circ} = 340^{\circ}$ which isn't what we want.
@@ -150,8 +160,10 @@ as the weighted average of the states of all the particles.
 
 In the update step, the filter computes $P(\theta|\text{data}) \approx P(\text{data}|\theta)P(\theta)$ for each particle. The prior $P(\theta)$ is given by the particle’s previous weight, while $P(\text{data}|\theta)$ is calculated 
 according to the probability distribution defined for the measurement noise. One of the benefits of the particle filter is that, unlike the normal distribution requirement of the Kalman filter, any arbitrary noise 
-distribution may be employed. In this case, we used the Von Mises distribution \textcolor{red}{TODO} [DEFINE,show plot]. This closely approximates a Normal distribution that is “wrapped” around the angle boundary between $0$ and $2\pi$. 
-Thus, no other consideration of angle wrapping must be made for the particle filter. After the posterior weights have been calculated, they are again normalized by their sum so they represent a probability distribution.
+
+distribution may be employed. In this case, we used the Von Mises distribution \textcolor{red}{TODO} [DEFINE,show plot,explain Kappa parameter as it correlates to certainty on particle's location]. This closely approximates a Normal distribution 
+that is “wrapped” around the angle boundary between $0$ and $2\pi$. Thus, no other consideration of angle wrapping must be made for the particle filter. After the posterior weights have been calculated, they are again normalized by 
+their sum so they represent a probability distribution.
 
 \begin{figure}[htp]
     \centering
@@ -161,26 +173,23 @@ Thus, no other consideration of angle wrapping must be made for the particle fil
     \label{fig:particle_filter_stuff}
 \end{figure}
 
-TODO graph of Von Mises distribution with explanation of how Kappa parameter 
-correlates to certainty on particle's location.
-
 Particle filters suffer from what is called the "Degeneracy Problem", in which the weights become concentrated in a small number of the total particles. This is solved by resampling, a process in which low probability particles are replaced 
-with higher probability particles. Detailing this problem and its solution is beyond our scope, but we used the TODO [fix format of this] $\text{systematic\_resample}$ function from $\text{filterpy}$ to accomplish resampling.
+with higher probability particles. Detailing this problem and its solution is beyond our scope, but we used the \lstinline{systematic_resample} function from \lstinline{filterpy} to accomplish resampling.
 
 As the particle filter keeps track of a large number of possible states which are distributed around the circle, it is much more flexible to nonlinear behavior. This is desirable in our case, as the source location may possibly reappear at any 
-location in the state space. Unfortunately, the particle filter performs a similar number of computations for each individual particle as the Kalman filter performs in total. As we are using $\text{NUM\_PARTICLES}$, our particle filter takes $\text{N\_PARTICLES}$ 
+location in the state space. Unfortunately, the particle filter performs a similar number of computations for each individual particle as the Kalman filter performs in total. As we are using \lstinline{num_particles}, our particle filter takes \lstinline{n_particles} 
 times as long to compute each step.
 
 The Particle filter is defined with the following hyperparameters: 
 \begin{itemize}
-    \item $K1$ defines the analogous variance term for the distribution of the state noise,
-    \item $K2$ defines the same for the measurements noise,
-    \item $\text{N\_particles}$ defines the number of particles the model employs, and
-    \item $\text{N\_eff\_particles}$ defines the minimum number of “effective” particles allowed before particles are resampled.
+    \item \lstinline{K1} defines the analogous variance term for the distribution of the state noise,
+    \item \lstinline{K2} defines the same for the measurements noise,
+    \item \lstinline{N_particles} defines the number of particles the model employs, and
+    \item \lstinline{N_eff_particles} defines the minimum number of “effective” particles allowed before particles are resampled.
 \end{itemize}
 
-Similar to the Kalman filter, we tuned the hyperparameters $K1$, $K2$, $\text{N\_particles}$, and $\text{N\_eff\_particles}$ by performing a gridsearch over many different possible values. A filter was constructed for each hyperparameter combination, with its performance 
-tested across several different datasets. We then chose the hyperparameters that produced minimum average angular error over the different datasets. 
+Similar to the Kalman filter, we tuned the hyperparameters \lstinline{K1}, \lstinline{K2}, \lstinline{N_particles}, and \lstinline{N_eff_particles} by performing a gridsearch over many different possible values. A filter was constructed for each hyperparameter combination, with its performance 
+tested across several different datasets. We then chose the hyperparameters that produced minimum average angular error over the different datasets. A similar method was implemented for a robotics research paper as well see \cite{Oops}.
 
 \section{Results and Analysis}
 
@@ -209,56 +218,16 @@ be accounted for before deploying these methods in the field to ensure that the 
 it should be emphasized that operators should still use sight and radio communication to identify nearby individuals, and that people near machinery must still exercise caution. 
 
 \section{Conclusion}
+Our goal was to improve robustness of the angle estimation by adapting filtering methods for use with circular data. We derived a very simple modification to the Kalman filter that 
+allows it to work for circular data, and we implemented a particle filter using circular probability distributions. We found the particle filter and the circular Kalman filter suitable 
+for angular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient but suffers in 
+accuracy in cases of strong nonlinearity. Due to the wraparound property of angular data, the leaky filter and unmodified Kalman filter are highly unsuitable for angular data. The particle 
+filter and circular Kalman filter were both suitable, and can be adapted depending on the project’s needs.
 
-
-
-
-
-
-
-
-
-
-
-
-
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=0.45\textwidth]{temp.pdf}\hfill
-    \includegraphics[width=0.45\textwidth]{temp.pdf}\hfill
-    \caption{The constant alpha functions (left) along with the timeplot using IVP (right).}
-    \label{fig:constant_alpha}
-
-\end{figure}
-
-
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=0.45\textwidth]{temp.pdf}\hfill
-    \includegraphics[width=0.45\textwidth]{temp.pdf}\hfill
-
-    \caption{The discontinuous alpha functions (left) along with the timeplot using IVP (right).}
-    \label{fig:discontinuous_alpha}
-
-\end{figure}
-
-
-
-
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=0.3\textwidth]{temp.pdf}\hfill
-    \includegraphics[width=0.3\textwidth]{temp.pdf}\hfill
-    \includegraphics[width=0.3\textwidth]{temp.pdf}\hfill
-    \caption{Simulating with $A_{interp.12}$ (left), giving the timeplots using both IVP (center) and BVP (right).}
-    \label{fig:continuous_alpha}
-
-\end{figure}
-
-
-
-
-
+For the BYU Acoustics project specifically, if the computational cost of the filtering step is a concern, we would recommend use of the circular Kalman filter for this project due to its low 
+cost and accurate performance except in cases of strong nonlinearity. If more computational headroom is allowed, the particle filter would be ideal, as it performed well even in cases of 
+nonlinearities. Furthermore, the utility of these methods extends to any field in which angle measurements are taken, including robotics, navigation, and astronomy. The hyperparameters of our 
+methods can easily be modified to adjust accuracy, flexibility, and computational cost depending on what is needed for the given scenario. 
 
 
 

@@ -159,3 +159,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 .DS_Store
+vol-3/Rough_Draft.synctex.gz
+vol-3/Rough_Draft.aux
+vol-3/Rough_Draft.fdb_latexmk
+vol-3/Rough_Draft.fls
+vol-3/Rough_Draft.out
