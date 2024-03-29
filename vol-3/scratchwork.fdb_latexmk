@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1711739719 "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" "scratchwork.pdf" "scratchwork" 1711739720 0
+["pdflatex"] 1711739806 "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" "scratchwork.pdf" "scratchwork" 1711739807 0
   "/Users/curtisevans/ACME_Projects/cannon-curtis-spencer-tyler-acme/vol-3/scratchwork.tex" 1711739718 17576 92a14574cb4be092440dc632f861f199 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/dejavu/dejavumono_t1-type1.enc" 1380151016 2620 1ef8c8026e6f0fc7a8bfd158c7dfbe38 ""
@@ -211,10 +211,10 @@
   "/usr/local/texlive/2023/texmf.cnf" 1700576439 577 1b2b1af17af2508fb20dd85783af4050 ""
   "Pic of Real Mic Array.jpg" 1711733105 1077419 224a6dfdcb79bae457600be65a124c45 ""
   "actual_paper_graphs/all.pdf" 1711739338 127281 a1ac428c268608760a2022eb9a5c60fa ""
-  "altered_kalman.pdf" 1711731545 21435 62e4fa75be031d5cfd6faae6f33b9a99 ""
-  "non_altered_kalman.pdf" 1711731545 21427 afd18f78059973032285863896b44be7 ""
-  "scratchwork.aux" 1711739720 3313 322df64aed9d2bb8ce60dafd90f2dede "pdflatex"
-  "scratchwork.out" 1711739720 1595 c4c68d5bfc77024530c521e2f0b6f30e "pdflatex"
+  "altered_kalman.pdf" 1711739797 21069 08d957d032c3695f031cad9d23749eb8 ""
+  "non_altered_kalman.pdf" 1711739789 21431 9a159e59f682006af4a58fef7386607f ""
+  "scratchwork.aux" 1711739807 3313 322df64aed9d2bb8ce60dafd90f2dede "pdflatex"
+  "scratchwork.out" 1711739807 1595 c4c68d5bfc77024530c521e2f0b6f30e "pdflatex"
   "scratchwork.tex" 1711739718 17576 92a14574cb4be092440dc632f861f199 ""
   (generated)
   "scratchwork.aux"
