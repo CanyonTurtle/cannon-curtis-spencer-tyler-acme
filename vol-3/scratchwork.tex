@@ -2,7 +2,7 @@
 %%% WARNING: Do NOT change the page size, fonts, or margins!  Penalties will apply.
 
 
-\usepackage{graphicx}
+\usepackage{graphicx, hyperref}
 \usepackage{amssymb,amsmath,amsthm, mathtools}
 \usepackage{placeins} %enables \FloatBarrier, that prevents floats from going below it.
 \usepackage{caption}
@@ -88,7 +88,7 @@ H = \begin{pmatrix*}[l]
     1 & 0 & 0
 
 \end{pmatrix*}\]
- where $H$ is of dimension $18\times3$. We don't have any control in our situation so our state space is
+ where $H$ is of dimension $n\times3$ for $n$ observed angles. We don't have any control in our situation so our state space is
  \[\mathbf{x}_t = F\mathbf{x}_{t-1} + \mathbf{w}_t,\]
 \[\mathbf{z}_t = H\mathbf{x}_t + \mathbf{v}_t\].
 
@@ -103,7 +103,7 @@ A toy example would be if we are looking at an observed angle $\mathbf{z}_i = 15
 then $\mathbf{z}_i - (H\mathbf{x})_i = 15^{\circ} - 355^{\circ} = -340^{\circ}$ and we desire $20^{\circ}$. We could simply do this by noticing that $-340 \equiv 20 \pmod {360}$,
 however, if we said $\mathbf{z}_i=355^{\circ}$ and $(H\mathbf{x})_i = 15^{\circ}$ then $\mathbf{z}_i - (H\mathbf{x})_i = 355^{\circ} - 15^{\circ} = 340^{\circ}$ which isn't what we want.
 We want the Kalman filter to think of this difference as $-20^{\circ}$. The best way to do this was by implementing Algorithm \ref{alg:kalman} which will get us the right differenced needed by 
-the correct sign so the Kalman filter can function correctly. We saw great results from this in our stimulated data. See Figure \ref{fig:simple_kalman}.
+the correct sign so the Kalman filter can function correctly.
 
 \begin{figure}[htp]
     \centering
@@ -118,27 +118,54 @@ the correct sign so the Kalman filter can function correctly. We saw great resul
 \begin{algorithm}
     \caption{Process to Fix Wraparound}\label{alg:kalman}    
     \begin{algorithmic}
-        \State $\mathbf{v} \gets \mathbf{z}_k - H\mathbf{x}_k$
-        \If{$\lvert{\mathbf{v}}\rvert \geq \pi \;\textbf{and}\; \mathbf{v}_k \leq 0$} 
+        \State $\mathbf{v} \gets \mathbf{z}_t - H\mathbf{x}_t$
+        \If{$\lvert{\mathbf{v}}\rvert \geq \pi \;\textbf{and}\; \mathbf{v}\leq 0$} 
             \State $\mathbf{v} \gets \mathbf{v} + 2\pi$
-        \ElsIf{$\lvert{\mathbf{v}}\rvert \geq \pi \;\textbf{and}\; \mathbf{v}_k \geq 0$} 
+        \ElsIf{$\lvert{\mathbf{v}}\rvert \geq \pi \;\textbf{and}\; \mathbf{v} \geq 0$} 
             \State $\mathbf{v} \gets \mathbf{v} - 2\pi$
         \EndIf 
-        \State $\tilde{\mathbf{y}} = \mathbf{v}$ 
+        \State $\tilde{\mathbf{y}_t} = \mathbf{v}$ 
         \end{algorithmic}
     \end{algorithm}
 
 %% Insert some pictures of the angle adjustment and add the algorithm 
 
 \subsection{Particle Filter}
+The second method we employed was another type of Bayesian filter, the particle filter \cite{Particle}. The particle filter employs a large number of possible current states, each referred to 
+as a “particle”. Each particle has an associated weight, interpreted as the probability that particle accurately reflects the hidden state, with all weights summing to 1. As the source can possibly 
+come in at any angle, we initialize the particles with uniformly distributed states and weights. At each time step, the filter propagates all of the particles forward in time according to the state space 
+model, including adding state noise in the update. Then, using the data, it updates the weights of each particle by computing the posterior probabilities given data. Finally, it computes the state estimate 
+as the weighted average of the states of all the particles. 
+
+In the update step, the filter computes $P(\theta|\text{data}) \approx P(\text{data}|\theta)P(\theta)$ for each particle. The prior $P(\theta)$ is given by the particle’s previous weight, while $P(\text{data}|\theta)$ is calculated 
+according to the probability distribution defined for the measurement noise. One of the benefits of the particle filter is that, unlike the normal distribution requirement of the Kalman filter, any arbitrary noise 
+distribution may be employed. In this case, we used the Von Mises distribution \textcolor{red}{TODO} [DEFINE,show plot]. This closely approximates a Normal distribution that is “wrapped” around the angle boundary between $0$ and $2\pi$. 
+Thus, no other consideration of angle wrapping must be made for the particle filter. After the posterior weights have been calculated, they are again normalized by their sum so they represent a probability distribution.
 
 TODO graph of Von Mises distribution with explanation of how Kappa parameter 
 correlates to certainty on particle's location.
 
-TODO explain basis principles of Particle Filter and cite the book
-that Tyler referenced in implementation.
+Particle filters suffer from what is called the "Degeneracy Problem", in which the weights become concentrated in a small number of the total particles. This is solved by resampling, a process in which low probability particles are replaced 
+with higher probability particles. Detailing this problem and its solution is beyond our scope, but we used the TODO [fix format of this] $\text{systematic\_resample}$ function from $\text{filterpy}$ to accomplish resampling.
 
-\subsection{HMM Model}
+As the particle filter keeps track of a large number of possible states which are distributed around the circle, it is much more flexible to nonlinear behavior. This is desirable in our case, as the source location may possibly reappear at any 
+location in the state space. Unfortunately, the particle filter performs a similar number of computations for each individual particle as the Kalman filter performs in total. As we are using $\text{NUM\_PARTICLES}$, our particle filter takes $\text{N\_PARTICLES}$ 
+times as long to compute each step.
+
+The Particle filter is defined with the following hyperparameters: 
+\begin{itemize}
+    \item $K1$ defines the analogous variance term for the distribution of the state noise,
+    \item $K2$ defines the same for the measurements noise,
+    \item $\text{N\_particles}$ defines the number of particles the model employs, and
+    \item $\text{N\_eff\_particles}$ defines the minimum number of “effective” particles allowed before particles are resampled.
+\end{itemize}
+
+Similar to the Kalman filter, we tuned the hyperparameters $K1$, $K2$, $\text{N\_particles}$, and $\text{N\_eff\_particles}$ by performing a gridsearch over many different possible values. A filter was constructed for each hyperparameter combination, with its performance 
+tested across several different datasets. We then chose the hyperparameters that produced minimum average angular error over the different datasets. 
+
+\subsection{Leaky Filter}
+
+TODO explain leaky filter and how it is working
 
 \section{Results}
 
@@ -155,8 +182,11 @@ TODO tradeoffs of Particle filter - the compute time 500x longer for 500 particl
 - and both have a way to specify how much we "belive" current measurements
 
 \section{Ethical Considerations}
-Some possible use cases of this project would be so that big machinery can detect an angle of danger where a person might be. 
-This isn't a great a 
+This project seeks to augment the safety of those outside the machinery by increasing the awareness of the machine operators. However, before deployment, this model must be 
+shown to improve safety as much as or more than it increased the safety perception of the operators. Risk compensation “is a theory which suggests that people typically adjust 
+their behavior in response to perceived levels of risk, becoming more careful where they sense greater risk and less careful if they feel more protected” [citation]. This should 
+be accounted for before deploying these methods in the field to ensure that the model performs robustly enough to truly enhance overall safety, despite risk compensation. Furthermore, 
+it should be emphasized that operators should still use sight and radio communication to identify nearby individuals, and that people near machinery must still exercise caution. 
 
 \section{Conclusion}
 
@@ -225,7 +255,7 @@ This isn't a great a
 %% If not using bibtex, comment out the previous two lines and uncomment those below
 \begin{thebibliography}{99}
 \bibitem{V3} The ACME Volume 3 Textbook
-\bibitem{Migration} Wang Xiang-Sheng and Wu Jianhong 2012. Seasonal migration dynamics: periodicity, transition delay and finite-dimensional reductionProc. R. Soc. A.468634–650. http://doi.org/10.1098/rspa.2011.0236
+\bibitem{Particle} Labbe, Roger. “Kalman and Bayesian Filters in Python”.
 \bibitem{Population} Pierre Auger, Jean-Christophe Poggiale, Emergence of Population Growth Models: Fast Migration and Slow Growth, Journal of Theoretical Biology, Volume 182, Issue 2, 1996, Pages 99-108, ISSN 0022-5193, https://doi.org/10.1006/jtbi.1996.0145.
 \end{thebibliography}
 
