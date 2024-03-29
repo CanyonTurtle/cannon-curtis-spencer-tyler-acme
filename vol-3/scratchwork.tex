@@ -37,24 +37,22 @@
 
 %% First Section
 \section{Problem Statement and Motivation}
-A BYU Acoustics Research Group project is currently using a microphone array and triangulation to calculate the direction of arrival of a 
-source in relation to the center of the array. They’ve implemented some rudimentary filtering, but so far the results of the calculation are 
-somewhat unreliable. We want to take this process and model it as a time series/Hidden Markov model in order to optimize the calculation process. 
-We will potentially employ Kalman filtering in order to filter angle measurements. We will also explore whether cross-correlation or GCC-PHAT 
-is the better measure of coherence between microphone signals for this purpose, and whether the hidden state should be modeled as an angle or 
-be modeled directly as a series of coherence measurements. We will also experiment with ways to represent the observation space. This will also 
-include trying to predict whether there is or isn’t a speaker currently present.
+A BYU Acoustics research project seeks to reproduce the filtered sound signal from a source near heavy machinery, within the cab for the operator. In essence, 
+the machine operator should hear the reproduced voice of someone outside the cab speaking clearly from the direction they stand in relation to the machine. This 
+will augment the safety of those outside the machinery by increasing the awareness of the machine operators. Our aim is to improve the robustness of the angle 
+estimation in order to allow the researchers to more accurately reproduce the sound directionality.
+
+Currently, the angle in relation to the center of the microphone array is calculated using triangulation. Somewhat rudimentary filtering has been implemented to 
+improve stability, but so far the results of the calculation are still unreliable. We modeled the angle of arrival evolution process as a continuous state space 
+hidden Markov model and employed various Bayesian filtering techniques in order to optimize the angle estimation. This included adapting filters normally used 
+with data defined for all real numbers and gaussian distributed noise to circular data that are defined on $[0,2\pi]$ with the wrapping property at the boundary.
+
+Previous work has shown that an unmodified Kalman Filter does not work well on angular data, and our experience working with this data supports that conclusion. 
+Various distributions, including a wrapped normal distribution and the Von Mises distribution have been adapted to be used with the Kalman Filter successfully. 
+However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture. Particle filters 
+are a type of filtering algorithm that allow for the use of an arbitrary distribution and have been used with circular distributions before.
 
 
-Several of the noise reduction algorithms they have implemented depend on a highly accurate angle measurement. As those algorithms have already been 
-implemented, we would be primarily concerned with the step of direction of arrival angle estimation and optimization, as well as optimally estimating 
-the corresponding time delay. This would provide the research group with enhanced measurements for use in their noise processing algorithms.
-	
-
-This relates to the hidden markov model because we don’t know what the angles are that we are looking for, but we do know how to take a measurement of 
-the current pressure at each microphone. We will use these microphones to be our observed data to then figure out what these angles are by creating a HMM. 
-The angles are to be calculated at discrete time steps according to the current pressure measurement. The Kalman filter might accurately represent the 
-system and more optimally combine current and prior information about the angle in order to calculate a less noisy current angle estimate.
 
 %% Second Section
 \section{Data}
