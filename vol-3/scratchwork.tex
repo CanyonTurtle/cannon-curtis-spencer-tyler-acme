@@ -32,7 +32,7 @@
 \maketitle
 
 \begin{abstract}
-    
+    This paper attempts to adapt linear filtering methods to work with angular data in order to predict angle of arrival of human voices. The data used for this project was both simulated and real data. We used various Bayesian filtering techniques on a continuous state space model to optimize angle estimation.
 \end{abstract}
 
 %% First Section
@@ -42,29 +42,43 @@ the machine operator should hear the reproduced voice of someone outside the cab
 will augment the safety of those outside the machinery by increasing the awareness of the machine operators. Our aim is to improve the robustness of the angle 
 estimation in order to allow the researchers to more accurately reproduce the sound directionality.
 
-Currently, the angle in relation to the center of the microphone array is calculated using triangulation. Somewhat rudimentary filtering has been implemented to 
+\begin{figure}
+\includegraphics*[width=0.95\textwidth]{Pic of Real Mic Array.jpg}\hfill
+\caption{Microphone array used in data collection.}
+\label{fig:array}
+\end{figure}
+
+Currently, the angle in relation to the center of the microphone array (see Figure \ref{fig:array}) is calculated using triangulation. Somewhat rudimentary filtering has been implemented to 
 improve stability, but so far the results of the calculation are still unreliable. We modeled the angle of arrival evolution process as a continuous state space 
 hidden Markov model and employed various Bayesian filtering techniques in order to optimize the angle estimation. This included adapting filters normally used 
 with data defined for all real numbers and gaussian distributed noise to circular data that are defined on $[0,2\pi]$ with the wrapping property at the boundary.
 
 Previous work has shown that an unmodified Kalman Filter does not work well on angular data, and our experience working with this data supports that conclusion. 
 Various distributions, including a wrapped normal distribution and the Von Mises distribution have been adapted to be used with the Kalman Filter successfully. 
-However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture. Particle filters 
+However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture \cite{Research}. Particle filters 
 are a type of filtering algorithm that allow for the use of an arbitrary distribution and have been used with circular distributions before.
 
 
 
 %% Second Section
 \section{Data}
-The data for this project will be provided by the research team (Curtis Garner) that is currently working on it. The data includes measurements where the sound 
-source is and is not moving, is and is not present, and measurements that do and don’t include machine noise in the microphone signal.
-
-
+The data used for this project was both stimulated data and real data given to us by the research
+team. The research team didn’t provide all the data we needed to test our methods, so we decided to
+stimulate our own data. The situations we needed to test were a stationary angle, moving angle, and
+discontinuous angle. The stationary angle would be someone standing still talking to the machine
+operator, the moving angle would be someone walking around the machine while talking continuously,
+and the discontinuous angle would be someone walking around the machine while talking
+intermittently. The first situation we got data from the research team and the later two situations
+we needed to stimulate. We are waiting for real data to test the last two with our methods. 
 
 
 %% Third Section 
 \section{Methods}
 We have tried several methods to compute the hidden angle measurement. We tried the following methods...
+
+\subsection{Leaky Filter}
+
+The leaky filter is a simple filter that just takes the last $n$ samples and finds the average to use as the estimate of the true state. This is the filter currently being used on the project and the results have not been incredibly useful.
 
 \subsection{State Space Model}
 First we had to set up our continuous state space model. We needed angular velocity in our state space so to do that we do a finite difference approximation 
@@ -91,7 +105,7 @@ H = \begin{pmatrix*}[l]
 \[\mathbf{z}_t = H\mathbf{x}_t + \mathbf{v}_t\].
 
 \subsection{Kalman Filter}
-We implemented the Kalman filter from the Volume 3 Textbook \cite{V3}. To understand how angle measurements worked in the Kalman Filter we tried it with
+We implemented the Kalman filter from the Volume 3 Textbook \cite{V3} and Lab Manual \cite{V3 Lab Manual}. To understand how angle measurements worked in the Kalman Filter we tried it with
 stimulated data done in the lab manuals and class. We discovered a problem with the update step in angle wraparound from the angles in the range of 
 \[2\pi - \epsilon \leq \theta \leq 2\pi + \epsilon\] for some $\epsilon \geq 0$. We notices that the more noise we added the larged this $\epsilon$ got. 
 See figure \ref{fig:simple_kalman} to get a visual.
@@ -161,10 +175,6 @@ The Particle filter is defined with the following hyperparameters:
 Similar to the Kalman filter, we tuned the hyperparameters $K1$, $K2$, $\text{N\_particles}$, and $\text{N\_eff\_particles}$ by performing a gridsearch over many different possible values. A filter was constructed for each hyperparameter combination, with its performance 
 tested across several different datasets. We then chose the hyperparameters that produced minimum average angular error over the different datasets. 
 
-\subsection{Leaky Filter}
-
-TODO explain leaky filter and how it is working
-
 \section{Results}
 
 We had success with circular filtering techniques by using Algorithm \ref{alg:kalman} allowed us to use Kalman Filters with circular mechanics.
@@ -182,7 +192,7 @@ TODO tradeoffs of Particle filter - the compute time 500x longer for 500 particl
 \section{Ethical Considerations}
 This project seeks to augment the safety of those outside the machinery by increasing the awareness of the machine operators. However, before deployment, this model must be 
 shown to improve safety as much as or more than it increased the safety perception of the operators. Risk compensation “is a theory which suggests that people typically adjust 
-their behavior in response to perceived levels of risk, becoming more careful where they sense greater risk and less careful if they feel more protected” [citation]. This should 
+their behavior in response to perceived levels of risk, becoming more careful where they sense greater risk and less careful if they feel more protected” \cite{Risk}. This should 
 be accounted for before deploying these methods in the field to ensure that the model performs robustly enough to truly enhance overall safety, despite risk compensation. Furthermore, 
 it should be emphasized that operators should still use sight and radio communication to identify nearby individuals, and that people near machinery must still exercise caution. 
 
@@ -252,9 +262,12 @@ it should be emphasized that operators should still use sight and radio communic
 
 %% If not using bibtex, comment out the previous two lines and uncomment those below
 \begin{thebibliography}{99}
+\bibitem{Research} G. Kurz, I. Gilitschenski and U. D. Hanebeck, "Recursive nonlinear filtering for angular data based on circular distributions," \textit{2013 American Control Conference}, Washington, DC, USA, 2013, pp. 5439-5445, doi: 10.1109/ACC.2013.6580688.
 \bibitem{V3} The ACME Volume 3 Textbook
+\bibitem{V3 Lab Manual} J. Humpherys and T. Jarvis, "Labs for Foundations of Applied Mathematics, Volume 3, Modeling with Uncertainty and Data."
 \bibitem{Particle} Labbe, Roger. “Kalman and Bayesian Filters in Python”.
-\bibitem{Population} Pierre Auger, Jean-Christophe Poggiale, Emergence of Population Growth Models: Fast Migration and Slow Growth, Journal of Theoretical Biology, Volume 182, Issue 2, 1996, Pages 99-108, ISSN 0022-5193, https://doi.org/10.1006/jtbi.1996.0145.
+\bibitem{Risk} Masson, Maxime; Lamoureux, Julie; de Guise, Elaine (October 2019). "Self-reported risk-taking and sensation-seeking behavior predict helmet wear amongst Canadian ski and snowboard instructors". \textit{Canadian Journal of Behavioural Science.} 52 (2): 121–130. doi:10.1037/cbs0000153. S2CID 210359660.
+\bibitem{Oops} I. Marković and I. Petrović, "Speaker localization and tracking with a microphone array on a mobile robot using von Mises distribution and particle filtering," \textit{Robotics and Autonomous Systems}, Volume 58, Issue 11, 2010, pp. 1185-1196, doi: 10.1016/j.robot.2010.08.001
 \end{thebibliography}
 
 \end{document}
