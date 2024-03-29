@@ -168,7 +168,7 @@ as the weighted average of the states of all the particles.
 In the update step, the filter computes $P(\theta|\text{data}) \approx P(\text{data}|\theta)P(\theta)$ for each particle. The prior $P(\theta)$ is given by the particle’s previous weight, while $P(\text{data}|\theta)$ is calculated 
 according to the probability distribution defined for the measurement noise. One of the benefits of the particle filter is that, unlike the normal distribution requirement of the Kalman filter, any arbitrary noise 
 
-distribution may be employed. In this case, we used the Von Mises distribution \textcolor{red}{TODO} [DEFINE,show plot,explain Kappa parameter as it correlates to certainty on particle's location]. This closely approximates a Normal distribution 
+distribution may be employed. In this case, we used the Von Mises distribution (see Figure \ref{fig:particle_filter_stuff}, right side). This closely approximates a Normal distribution 
 that is “wrapped” around the angle boundary between $0$ and $2\pi$. Thus, no other consideration of angle wrapping must be made for the particle filter. After the posterior weights have been calculated, they are again normalized by 
 their sum so they represent a probability distribution.
 
@@ -211,7 +211,7 @@ method was implemented for a robotics research paper as well see \cite{Oops}.
     \label{fig:all_filters}
 \end{figure}
 
-We had success filtering across both simulated and real microphone angle data; see Figure \ref{fig:all_filters} for each simulation. by using Algorithm \ref{alg:kalman} allowed us to use Kalman Filters with circular mechanics.
+We had success filtering across both simulated and real microphone angle data; see Figure \ref{fig:all_filters} for each simulation. Using Algorithm \ref{alg:kalman} allowed us to use Kalman Filters with circular mechanics.
 
 
 TODO tradeoffs of Particle filter - the compute time 500x longer for 500 particles
