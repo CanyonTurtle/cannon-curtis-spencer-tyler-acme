@@ -39,7 +39,9 @@
 \date{\today}
 
 \begin{abstract}
-    This paper attempts to adapt linear filtering methods to work with angular data in order to predict angle of arrival of human voices. The data used for this project was both simulated and real data. We used various Bayesian filtering techniques on a continuous state space model to optimize angle estimation.
+    This paper attempts to adapt linear filtering methods to work with angular data in order to predict angle of arrival of human voices. The data used for this 
+    project was both simulated and real data. We used various Bayesian filtering techniques on a continuous state space model to optimize angle estimation. We had
+    success with a particle filter and a circular Kalman filter.
 \end{abstract}
 
 \maketitle
@@ -51,7 +53,7 @@ the machine operator should hear the reproduced voice of someone outside the cab
 will augment the safety of those outside the machinery by increasing the awareness of the machine operators. Our aim is to improve the robustness of the angle 
 estimation in order to allow the researchers to more accurately reproduce the sound directionality.
 
-\begin{figure}
+\begin{figure}[htp]
 \includegraphics*[width=0.95\textwidth]{Pic of Real Mic Array.jpg}\hfill
 \caption{Microphone array used in data collection.}
 \label{fig:array}
@@ -71,14 +73,14 @@ are a type of filtering algorithm that allow for the use of an arbitrary distrib
 
 %% Second Section
 \section{Data}
-The data used for this project was both stimulated data and real data given to us by the research
+The data used for this project was both simulated data and real data given to us by the research
 team. The research team didn’t provide all the data we needed to test our methods, so we decided to
-stimulate our own data. The situations we needed to test were a stationary angle, moving angle, and
+simulate our own data. The situations we needed to test were a stationary angle, moving angle, and
 discontinuous angle. The stationary angle would be someone standing still talking to the machine
 operator, the moving angle would be someone walking around the machine while talking continuously,
 and the discontinuous angle would be someone walking around the machine while talking
 intermittently. The first situation we got data from the research team and the later two situations
-we needed to stimulate. We are waiting for real data to test the last two with our methods. 
+we needed to simulate. We are waiting for real data to test the last two with our methods. 
 
 
 %% Third Section 
