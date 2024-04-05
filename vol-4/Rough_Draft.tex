@@ -1,0 +1,96 @@
+\documentclass[11pt]{amsart}
+%%% WARNING: Do NOT change the page size, fonts, or margins!  Penalties will apply.
+
+\usepackage{graphicx, hyperref}
+\usepackage{amssymb,amsmath,amsthm, mathtools}
+\usepackage{placeins} %enables \FloatBarrier, that prevents floats from going below it.
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{algpseudocode, algorithm}
+\usepackage{tikz}
+\usepackage{physics}
+\usepackage[T1]{fontenc}
+\usepackage{DejaVuSansMono}
+\usetikzlibrary{arrows}
+\usetikzlibrary{tikzmark}
+\usepackage{listings}
+
+% Define style for Python code snippets
+\lstset{
+    language=Python,
+    basicstyle=\small\ttfamily, % Set font size to small
+    frame=single, % Add frame around code snippets
+    showstringspaces=false % Don't show spaces in strings
+}
+
+%%% WARNING: Do NOT change the page size, fonts, or margins!  Penalties will apply.
+%%% WARNING: Do NOT change the page size, fonts, or margins!  Penalties will apply.
+
+% Some macros for ease of use
+\newcommand{\R}{{\mathbb R}}
+\newcommand{\A}{{\mathrm{A}}}
+
+
+\begin{document}
+\title{Navigation to Arrakis using Slingshot}
+\author{Cannon Tuttle, Curtis Evans, Spencer Ashton, Tyler Sanders}
+
+%% comment out next command to put today's date after names of group members, or put a desired day in the parethesis
+\date{\today}
+
+\begin{abstract}
+    
+\end{abstract}
+
+\maketitle
+
+%% First Section
+\section{Problem Statement and Motivation}
+The Guild Navigators tasked with delivering House Atreides to Arrakis are unsure what the best path is to get from Caladan to Arrakis, but they know of a planet in another universe, Earth, where there 
+are smart ACME students learning about optimal control. They want to be able to figure out with a given travel time what the optimal path and control is, and they want to know what the optimal final time 
+would be to see if they have enough feasible fuel with that optimal control. Since the ACME students are from another universe and solar system they have decided to focus on getting from their home planet, 
+Earth, to other planets in their own solar system. 
+
+\section{State Equations}
+We derived our state equations using kepler's law of motion.
+\[\ddot{\mathbf{x}} = G\sum_{p}^{N}\frac{m_p}{||\mathbf{x} - \mathbf{p}_p||_2^3}(\mathbf{x} - \mathbf{p}_p) + \mathbf{u}\]
+And the following cost functional
+\[J[u] = \int_{0}^{t_f}||\mathbf{u}||_2^2dt\]
+The following state equation
+\[\begin{pmatrix}
+    \dot{x}_s \\
+    \dot{y}_s \\
+    \ddot{x}_s\\
+    \ddot{y}_s 
+\end{pmatrix} = \begin{pmatrix}
+    \dot{x}_s \\
+    \dot{y}_s \\
+    G\sum_{p}^{N}\frac{m_p(x_s - p_x)}{((x_s-p_x)^2+(y_s-p_y)^2)^{3/2}} + u_x \\
+    G\sum_{p}^{N}\frac{m_p(y_s - p_y)}{((x_s-p_x)^2+(y_s-p_y)^2)^{3/2}} + u_y
+\end{pmatrix}\]
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Bibliography below
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\FloatBarrier % Keep the figures from being put after the bibliography
+\newpage
+%% If using bibtex, leave this uncommented
+%\bibliography{refs} %if using bibtex, call your bibtex file refs.bib
+\bibliographystyle{alpha}
+
+%% If not using bibtex, comment out the previous two lines and uncomment those below
+\begin{thebibliography}{99}
+\bibitem{Research} G. Kurz, I. Gilitschenski and U. D. Hanebeck, "Recursive nonlinear filtering for angular data based on circular distributions," \textit{2013 American Control Conference}, Washington, DC, USA, 2013, pp. 5439-5445, doi: 10.1109/ACC.2013.6580688.
+\bibitem{V3} The ACME Volume 3 Textbook
+\bibitem{V3 Lab Manual} J. Humpherys and T. Jarvis, "Labs for Foundations of Applied Mathematics, Volume 3, Modeling with Uncertainty and Data."
+\bibitem{Particle} Labbe, Roger. “Kalman and Bayesian Filters in Python”.
+\bibitem{Risk} Masson, Maxime; Lamoureux, Julie; de Guise, Elaine (October 2019). "Self-reported risk-taking and sensation-seeking behavior predict helmet wear amongst Canadian ski and snowboard instructors". \textit{Canadian Journal of Behavioural Science.} 52 (2): 121–130. doi:10.1037/cbs0000153. S2CID 210359660.
+\bibitem{Oops} I. Marković and I. Petrović, "Speaker localization and tracking with a microphone array on a mobile robot using von Mises distribution and particle filtering," \textit{Robotics and Autonomous Systems}, Volume 58, Issue 11, 2010, pp. 1185-1196, doi: 10.1016/j.robot.2010.08.001
+\end{thebibliography}
+
+\end{document}
