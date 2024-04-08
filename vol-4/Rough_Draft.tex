@@ -53,7 +53,7 @@ Earth, to other planets in their own solar system.
 
 \section{State Equations}
 We derived our state equations using kepler's law of motion.
-\[\ddot{\mathbf{x}} = G\sum_{p}^{N}\frac{m_p}{||\mathbf{x} - \mathbf{p}_p||_2^3}(\mathbf{x} - \mathbf{p}_p) + \mathbf{u}\]
+\[\ddot{\mathbf{x}} = -G\sum_{p\in{P}}^{}\frac{m_p}{||\mathbf{x}_s-\mathbf{x}_p||_2^3}(\mathbf{x}_s-\mathbf{x}_p) + \mathbf{u}\]
 And the following cost functional
 \[J[u] = \int_{0}^{t_f}||\mathbf{u}||_2^2dt\]
 The following state equation
@@ -65,8 +65,8 @@ The following state equation
 \end{pmatrix} = \begin{pmatrix}
     \dot{x}_s \\
     \dot{y}_s \\
-    G\sum_{p}^{N}\frac{m_p(x_s - p_x)}{((x_s-p_x)^2+(y_s-p_y)^2)^{3/2}} + u_x \\
-    G\sum_{p}^{N}\frac{m_p(y_s - p_y)}{((x_s-p_x)^2+(y_s-p_y)^2)^{3/2}} + u_y
+    -G\sum_{p\in{P}}^{}\frac{m_p(x_s - x_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_x \\
+    -G\sum_{p\in{P}}^{}\frac{m_p(y_s - y_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_y
 \end{pmatrix}\]
 
 
