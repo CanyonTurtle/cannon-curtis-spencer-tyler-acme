@@ -6,8 +6,11 @@ clear; clc;
 % [label,data2,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Data\CAT_Data\spring2024\test_03_white_noise_90_left.mcdr");
 % [label,data3,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Data\CAT_Data\spring2024\test_02_white_noise_45_left.mcdr");
 % [label,data,timestamp,fs,micPositions,channel_ID_string]=readMCDR("C:\Users\curti\OneDrive\CAT\CatRepo\Demo2024\testRecording.mcdr");
+% file_names = ['speech_0.mcdr';'speech_90.mcdr';'speech_moving.mcdr';'pinknoise_moving.mcdr';'pinknoise_90.mcdr';'pinknoise_0.mcdr'];
+
 data_path = 'C:\Repositories\cannon-curtis-spencer-tyler-acme\vol-3\Data\';
-file = 'test_01_white_noise_0_fwd.mcdr';
+file = 'pinknoise_0.mcdr';
+% file = 'test_01_white_noise_0_fwd.mcdr';
 file_to_read = [data_path, file];
 [label,data,timestamp,fs,micPositions,channel_ID_string]=readMCDR(file_to_read);
 
@@ -15,8 +18,6 @@ file_to_read = [data_path, file];
 
 micPositions=micPositions(1:7,:); % Remove channel 8 (some datasets have mic 8 in the wrong location)
 nMics=7;
-
-
 
 Signals=data(:,1:nMics); % Trim data to match mic number
 clearvars -except Signals fs micPositions nMics data file data_path
@@ -99,8 +100,8 @@ for b=1:nBlocks
 end
 
 %Save the angle estimates:
-CSV_name_all_angs = [data_path,'All_Angles_', file(1:end-4), 'csv'];
-CSV_name_one_angs = [data_path,'One_Angle_', file(1:end-4), 'csv'];
+CSV_name_all_angs = [data_path, file(1:end-5),'_All_Angles', '.csv'];
+CSV_name_one_angs = [data_path, file(1:end-5),'_One_Angle', '.csv'];
 writematrix(all_angs_time,CSV_name_all_angs)
 writematrix(est,CSV_name_one_angs)
 % writematrix(all_angs_time,"C:\Repositories\cannon-curtis-spencer-tyler-acme\vol-3\Data\ALL_ANGS_TEST.csv")
