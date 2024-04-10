@@ -206,7 +206,7 @@ hyperparameters that produced minimum average angular error over the different d
 method was implemented for a robotics research paper as well see \cite{Oops}.
 
 \section{Results and Analysis}
-Here is a breakdown of the speed and accuracy of each filter (see Figure \ref{fig:all_filters}).
+Here is a breakdown of the speed and accuracy of each filter (see Figures \ref{fig:all_simulated} and \ref{fig:all_real}).
 
 \subsection{Circular vs Naïve}
 First, we compared the performance of the naive and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
@@ -214,8 +214,8 @@ compared to the naive filter (see Figure \ref{fig:simple_kalman}). The Naive fil
 
 \begin{figure}[htp]
     \centering
-    \includegraphics[width=0.47\textwidth]{non_altered_kalman.pdf}\hfill
-    \includegraphics[width=0.47\textwidth]{altered_kalman.pdf}\hfill
+    \includegraphics[width=0.47\textwidth]{actual_paper_graphs/non_altered_kalman.pdf}\hfill
+    \includegraphics[width=0.47\textwidth]{actual_paper_graphs/altered_kalman.pdf}\hfill
     \caption{The naïve and circular Kalman Filter}
     \label{fig:simple_kalman}
 \end{figure}
@@ -248,12 +248,17 @@ to find the best filter for the engine dataset, see Figure \ref{fig:particle_hyp
 
 \begin{figure}[htp]
     \centering
-    \includegraphics[width=.95\textwidth]{actual_paper_graphs/all.pdf}\hfill
-    \caption{All filters, run on all datasets. Each row is a dataset, and each column is a type of filter. The green dots represent observations of the red true angle. The observations alone are filtered to produce the blue estimate angles.}
-    \label{fig:all_filters}
+    \includegraphics[width=.95\textwidth]{actual_paper_graphs/all_simulated.pdf}\hfill
+    \caption{All filters, run on simulated datasets. Each row is a dataset, and each column is a type of filter. The green dots represent observations of the red true angle. The observations alone are filtered to produce the blue estimate angles.}
+    \label{fig:all_simulated}
 \end{figure}
 
-
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.95\textwidth]{actual_paper_graphs/all_real.pdf}\hfill
+    \caption{All filters, run on all datasets. Each row is a dataset, and each column is a type of filter. The green dots represent observations of the red true angle. The observations alone are filtered to produce the blue estimate angles.}
+    \label{fig:all_real}
+\end{figure}
 
 \begin{figure}[htp]
     \centering
