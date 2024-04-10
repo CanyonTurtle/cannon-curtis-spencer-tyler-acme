@@ -49,7 +49,7 @@
 %% First Section
 \section{Problem Statement and Motivation}
 Imagine a machine operator in the cab of a excavator, or other heavy machinery, with a sound system in the cab that mimics the angle of workers giving instructions
-outside the cab. There needs to be a way to estimate the angle of arrival from those workers outside the cab and one possible way to achieve this angle is from observing
+outside the cab. There needs to be a way to estimate the angle of arrival from the sound of those workers outside the cab and one possible way to achieve this angle is from observing
 the sound signal from microphones outside the cab and filtering these measurements to predict the actual angle of arrival. This is essentially what a BYU Acoustics research project is 
 working towards. They ultimately seek to reproduce the filtered sound signal from a source and for the researchers a good angle approximation is within $\pm15^{\circ}$. Currently, the angle in relation to the center of the microphone array (see Figure \ref{fig:array}) 
 is calculated using triangulation. The sound signal is being observed in a noisy environment which causes noisy measurements. Somewhat rudimentary filtering has been implemented to improve stability, 
@@ -148,7 +148,7 @@ implemented.
 
 
 \begin{algorithm}
-    \caption{Process to Fix Wraparound}\label{alg:kalman}    
+    \caption{Altered Update Step}\label{alg:kalman}    
     \begin{algorithmic}
         \State $\mathbf{v} \gets \mathbf{z}_t - H\mathbf{x}_t$
         \If{$\lvert{\mathbf{v}}\rvert \geq \pi \;\textbf{and}\; \mathbf{v}\leq 0$} 
