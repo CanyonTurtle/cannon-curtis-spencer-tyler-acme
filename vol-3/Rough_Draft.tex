@@ -48,20 +48,20 @@
 
 %% First Section
 \section{Problem Statement and Motivation}
-A BYU Acoustics research project seeks to reproduce the filtered sound signal from a source near heavy machinery, within the cab for the operator. In essence, 
-the machine operator should hear the reproduced voice of someone outside the cab speaking clearly from the direction they stand in relation to the machine. This 
-will augment the safety of those outside the machinery by increasing the awareness of the machine operators. Our aim is to improve the robustness of the angle 
-estimation in order to allow the researchers to more accurately reproduce the sound directionality.
+Imagine a machine operator in the cab of a excavator, or other heavy machinery, with a sound system in the cab that mimics the angle of workers giving instructions
+outside the cab. There needs to be a way to estimate the angle of arrival from those workers outside the cab and one possible way to achieve this angle is from observing
+the sound signal from microphones outside the cab and filtering these measurements to predict the actual angle of arrival. This is essentially what a BYU Acoustics research project is 
+working towards. They ultimately seek to reproduce the filtered sound signal from a source and for the researchers a good angle approximation is within $\pm15^{\circ}$. Currently, the angle in relation to the center of the microphone array (see Figure \ref{fig:array}) 
+is calculated using triangulation. The sound signal is being observed in a noisy environment which causes noisy measurements. Somewhat rudimentary filtering has been implemented to improve stability, 
+but so far the results of the calculation are still unreliable. Our aim is to improve the robustness of the angle estimation in order to allow the researchers to more accurately reproduce the sound directionality.
 
 \begin{figure}[htp]
-\includegraphics*[width=0.95\textwidth]{Pic of Real Mic Array.jpg}\hfill
+\includegraphics*[width=0.5\textwidth]{Pic of Real Mic Array.jpg}\hfill
 \caption{Microphone array used in data collection.}
 \label{fig:array}
 \end{figure}
 
-Currently, the angle in relation to the center of the microphone array (see Figure \ref{fig:array}) is calculated using triangulation. Somewhat rudimentary filtering has been implemented to 
-improve stability, but so far the results of the calculation are still unreliable. We modeled the angle of arrival evolution process as a continuous state space 
-hidden Markov model and employed various Bayesian filtering techniques in order to optimize the angle estimation. This included adapting filters normally used 
+We modeled the angle of arrival evolution process as a continuous state space model and employed various Bayesian filtering techniques in order to optimize the angle estimation. This included adapting filters normally used 
 with data defined for all real numbers and gaussian distributed noise to circular data that are defined on $[0,2\pi]$ with the wrapping property at the boundary.
 
 Previous work has shown that an unmodified Kalman Filter does not work well on angular data, and our experience working with this data supports that conclusion. 
