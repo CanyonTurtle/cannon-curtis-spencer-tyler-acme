@@ -87,10 +87,6 @@ we needed to simulate. We are waiting for real data to test the last two with ou
 \section{Methods}
 We have tried several methods to compute the hidden angle measurement. Through this paper we use degrees in plots and examples, but all the measurements and computations were done in radians. We tried the following methods...
 
-\subsection{Leaky Filter}
-
-The leaky filter is a simple filter that just takes the last $n$ samples and finds the average to use as the estimate of the true state. This is the filter currently being used on the project and the results have not been incredibly useful.
-
 \subsection{State Space Model}
 First we had to set up our continuous state space model. We needed angular velocity in our state space so to do that we do a finite difference approximation 
 where $\theta'_t \approx \frac{\theta - \theta_{t-1}}{\Delta t}$. Now that we have angular velocity we can use it to make a simple forward Euler step in our state 
@@ -225,18 +221,18 @@ compared to the naive filter (see Figure \ref{fig:simple_kalman}). The Naive fil
 \end{figure}
 
 \subsection{Speed}
-The Kalman filters rivaled the Leaky filter in speed. For instance, the average time for the Leaky filter to run was about $3$ or $4$ miliseconds, while the Kalman filters ran in about $3$ to $5$ miliseconds on about 1 second worth of data. The Particle filter took about $125$ miliseconds on that dataset, so in total about $30$ times longer than the Kalman filters.
+The Kalman filters ran in about $3$ to $5$ miliseconds on about 1 second worth of data. The Particle filter took about $125$ miliseconds on that dataset, so in total about $30$ times longer than the Kalman filters.
 This means that all of our methods can be run in real time. 
 \subsection{Accuracy}
 We used average absolute angle error as our primary evaluation metric. This took the absolute value of the circular distance between the true state and predicted state at each time step and averaged it across time for the whole dataset. The performance of each filter varied depending on the dataset.
 \subsubsection{White Noise at Constant Angle}
-The Leaky filter was three times better on the White Noise dataset compared to the Particle filter, which was the second best filter. This is unsurprising since for a constant angle over time, the noise is normally distributed around the angle, which is a fixed mean. Thus, the MLE is a simple average, which is what the Leaky Filter is calculating.
+On the White Noise dataset, the Particle filter was the best filter, with about half the error of the Kalman filters. The error for the Kalman filters was almost exactly the same (.367 for Noncircular and .369 for Circular), which makes sense because the wraparound algorithm in the Circular Kalman filter was not used, making it behave exactly like the unmodified Kalman filter.
 \subsubsection{Constant Angle with Engine Noise}
-Quantitatively, the Leaky filter again performed best, but the graphs tell a different story. A large part of this data set is at a fixed angle, but when it does change, the Leaky filter is the slowest to catch up. The other three filters have higher variances, but adjust much faster. The particle filter performed the most robustly, with about half the error of the Kalman filters.
+The Particle filter performed the best again on this data set, however the imporovement over the Kalman filters was not as large as it was with the White Noise data set. The error of the Particle filter was $\approx 25\%$ lower than the unmodified Kalman filter and was $\approx 40\%$ lower than the Circular Kalman filter. It is interesting to note that the unmodified Kalman filter performed significantly better than the Circular Kalman filter on this data set.
 \subsubsection{Switching}
-This is an artificial dataset created to simulate jumping between angles across $0^{\circ}$. Both the Leaky filter and Naïve Kalman filters performed poorly on this dataset. The Circular Kalman and Particle filters performed much better, with the Particle filter being twice as accurate ($\mathrm{E}=0.453$ vs $\mathrm{E}=.243$).
+This is an artificial dataset created to simulate jumping between angles across $0^{\circ}$. The Naïve Kalman filter performed poorly on this dataset. The Circular Kalman and Particle filters performed much better, with the Particle filter being twice as accurate ($\mathrm{E}=0.199$ vs $\mathrm{E}=.392$) as the Circular Kalman filter.
 \subsubsection{With Jump}
-Here we see the true pitfall of the Leaky filter, not being able to track at all. The other filters all performed better, with the Particle filter again being the most accurate.
+The Naïve Kalman filter performs better on this data set vs the Switching data set, but the results of the other two filters are the same.
 \subsubsection{Wraparound}
 The results of this dataset are the same as the previous dataset.
 \subsubsection{The Best Filter}
@@ -277,7 +273,7 @@ it should be emphasized that operators should still use sight and radio communic
 Our goal was to improve robustness of the angle estimation by adapting filtering methods for use with circular data. We derived a very simple modification to the Kalman filter that 
 allows it to work for circular data, and we implemented a particle filter using circular probability distributions. We found the particle filter and the circular Kalman filter suitable 
 for angular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient but suffers in 
-accuracy in cases of strong nonlinearity. Due to the wraparound property of angular data, the leaky filter and unmodified Kalman filter are highly unsuitable for angular data. The particle 
+accuracy in cases of strong nonlinearity. Due to the wraparound property of angular data, the unmodified Kalman filter is highly unsuitable for angular data. The particle 
 filter and circular Kalman filter were both suitable, and can be adapted depending on the project’s needs.
 
 For the BYU Acoustics project specifically, if the computational cost of the filtering step is a concern, we would recommend use of the circular Kalman filter for this project due to its low 
