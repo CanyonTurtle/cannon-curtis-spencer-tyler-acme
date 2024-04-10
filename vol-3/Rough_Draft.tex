@@ -48,12 +48,9 @@
 
 %% First Section
 \section{Problem Statement and Motivation}
-Imagine a machine operator in the cab of a excavator, or other heavy machinery, with a sound system in the cab that mimics the angle of workers giving instructions
-outside the cab. There needs to be a way to estimate the angle of arrival from the sound of those workers outside the cab and one possible way to achieve this angle is from observing
-the sound signal from microphones outside the cab and filtering these measurements to predict the actual angle of arrival. This is essentially what a BYU Acoustics research project is 
-working towards. They ultimately seek to reproduce the filtered sound signal from a source and for the researchers a good angle approximation is within $\pm15^{\circ}$. Currently, the angle in relation to the center of the microphone array (see Figure \ref{fig:array}) 
-is calculated using triangulation. The sound signal is being observed in a noisy environment which causes noisy measurements. Somewhat rudimentary filtering has been implemented to improve stability, 
-but so far the results of the calculation are still unreliable. Our aim is to improve the robustness of the angle estimation in order to allow the researchers to more accurately reproduce the sound directionality.
+Imagine a construction site with heavy machinery, such as excavators, dump trucks, etc.,  in operation. The machine operator typically communicates with designated spotters via radio, but this leaves any other workers on the site unable to interface directly with the machine operators. A BYU acoustics project seeks to remedy this with a sound system that can pick up on the sound of human voice from outside the machine, filter out the noise, and reproduce the speech, including its relative direction to the machine, for the machine operator.  This will augment the safety of those outside the machinery by increasing the awareness of the machine operators.
+
+In order to replicate the directionality of the sound, the angle of arrival of the sound must be accurately estimated over time. Currently, this angle in relation to the center of the microphone array (see Figure \ref{fig:array}) is calculated using pressure measurements and triangulation. According to the researchers, a sufficiently good angle approximation for this application is within $\pm15^{\circ}$ of the true angle. However, the noisy environment makes raw triangulation insufficiently accurate. Somewhat rudimentary filtering has been implemented to improve stability, but so far the results of the calculation are still unreliable.
 
 \begin{figure}[htp]
 \includegraphics*[width=0.5\textwidth]{Pic of Real Mic Array.jpg}\hfill
@@ -61,26 +58,18 @@ but so far the results of the calculation are still unreliable. Our aim is to im
 \label{fig:array}
 \end{figure}
 
-We modeled the angle of arrival evolution process as a continuous state space model and employed various Bayesian filtering techniques in order to optimize the angle estimation. This included adapting filters normally used 
-with data defined for all real numbers and gaussian distributed noise to circular data that are defined on $[0,2\pi]$ with the wrapping property at the boundary.
+Our aim is to improve the robustness of the angle estimation in order to allow the researchers to more accurately reproduce the sound directionality. Previous work has shown that an unmodified Kalman Filter does not work well on angular data\cite{Research}. Various distributions, including a wrapped normal distribution and the Von Mises distribution have been successfully implemented to be used with Kalman type filters. However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture \cite{Research}.
 
-Previous work has shown that an unmodified Kalman Filter does not work well on angular data, and our experience working with this data supports that conclusion. 
-Various distributions, including a wrapped normal distribution and the Von Mises distribution have been adapted to be used with the Kalman Filter successfully. 
-However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture \cite{Research}. Particle filters 
-are a type of filtering algorithm that allow for the use of an arbitrary distribution and have been used with circular distributions before.
+We modeled the angle of arrival evolution process as a continuous state space model and employed various Bayesian filtering techniques in order to optimize the angle estimation. This included adapting Kalman filters, normally used with data defined for all real numbers and gaussian distributed noise, to work with circular data that are defined on $[0,2\pi]$ with the wrapping property at the boundary. We also adapted a Particle filter, a type of Bayesian filter that allows for the use of an arbitrary distribution, for use with circular probability distributions.
+
 
 
 
 %% Second Section
 \section{Data}
-The data used for this project was both simulated data and real data given to us by the research
-team. The research team didn’t provide all the data we needed to test our methods, so we decided to
-simulate our own data. The situations we needed to test were a stationary angle, moving angle, and
-discontinuous angle. The stationary angle would be someone standing still talking to the machine
-operator, the moving angle would be someone walking around the machine while talking continuously,
-and the discontinuous angle would be someone walking around the machine while talking
-intermittently. The first situation we got data from the research team and the later two situations
-we needed to simulate. We are waiting for real data to test the last two with our methods. 
+The data used for this project included both data given to us by the research team and simulated data. The original data is in the form of microphone pressure measurements that we then ran through a triangulation algorithm, provided to us by the research team, to produce angle measurements in time. Due to symmetry, each pair of microphones produces two possible angles. These can each be taken directly as possible measurements, producing 42 measurements per time step in our case, or all synthesized in order to produce a single angle measurement per time step. The provided triangulation algorithm produces data for both cases.
+However, the provided data didn’t include certain extreme scenarios relevant to this application, including harsh discontinuities, frequent angle wraparounds, etc. To account for these scenarios, we produced representative synthetic data by plotting a “true” angle, then adding gaussian noise to it to be used as the angle measurement. We also reserved real data to test our filter on after tuning our filter parameters.
+
 
 
 %% Third Section 
