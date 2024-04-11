@@ -43,11 +43,11 @@
     This paper attempts to adapt linear filtering methods to work with angular data in order to predict angle of arrival of human voices. The data used for this 
     project was both simulated and real data. We used various Bayesian filtering techniques on a continuous state space model to optimize angle estimation. We had
     success with a particle filter and a circular Kalman filter.
+\vspace{-\baselineskip}
 \end{abstract}
 
 \maketitle
-
-%% First Section
+\vspace{-\baselineskip}
 \section{Problem Statement and Motivation}
 Imagine a construction site with heavy machinery, such as excavators, dump trucks, etc.,  in operation. The machine operator typically communicates with designated spotters via radio, but this leaves any other workers on the site unable to interface directly with the machine operators. A BYU acoustics project seeks to remedy this with a sound system that can pick up on the sound of human voice from outside the machine, filter out the noise, and reproduce the speech, including its relative direction to the machine, for the machine operator.  This will augment the safety of those outside the machinery by increasing the awareness of the machine operators.
 
@@ -202,10 +202,35 @@ compared to the naive filter. The naïve filter tended toward the arithmetic mea
     \caption{The naïve and circular Kalman Filter}
     \label{fig:simple_kalman}
 \end{figure}
+\subsection{Filtering Multiple Angle Estimates}
+
+As discussed in Data, each microphone pair technically calculates two possible measured angles, which are normally synthesized by the provided triangulation algorithm to find the most likely angle. Since the observation matrix $H$ allows for an arbitrary number of measurements, we attempted filtering using all 42 angle measurements directly in our filters.  
+See Figure \ref{fig:multiple_angles}. 
+With this data, the filters all failed to accurately track the data in any of the measured datasets. We believe this is because the array is not symmetric with respect to the angle of arrival of the sound, leading to angle measurements that are not distributed normally around the true angle. However, if the microphone array were to be circular, this method may be viable. Thus, in all other cases we treated the one angle returned by the triangulation algorithm as the measurement angle.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.75\textwidth]{actual_paper_graphs/multiple_angles.pdf}\hfill
+    \caption{Filtering various real data with multiple simultaneous angle measurements. The approximate true angle (green) is calculated by the triangulation algorithm, while the filtered angle (blue) is estimated .}
+    \label{fig:multiple_angles}
+\end{figure}
+
+
+
+\subsection{Hyperparameter tuning of Most Accurate Filter}
+The particle filter has several model parameters as mentioned previously. We performed a grid search
+to find the best filter for the engine dataset, see Figure \ref{fig:particle_hyperparam}.
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.4\textwidth]{actual_paper_graphs/gridsearch_particle_filter.pdf}\hfill
+    \caption{Hyperparameter tuning of the Particle filter.}
+    \label{fig:particle_hyperparam}
+\end{figure}
+
 
 \subsection{Speed}
 The Kalman filters ran in about 3-5ms on 1 second of data, while the Particle filter took about 125ms, in total about $30$ times longer than the Kalman filters.
-Thus, all of our methods can run in real time. 
+Thus, all of our filters can run in real time. 
 
 
 \begin{figure}[htp]
@@ -240,49 +265,7 @@ The Naïve Kalman filter performs better on this data set vs the Switching data 
 \subsubsection{Wraparound}
 The results of this dataset are the same as the previous dataset.
 \subsubsection{The Best Filter}
-The Circular Kalman and Particle filters both had consistent errors no matter the data set. The real trade off is whether we care more about speed or performance. The Particle filter was around twice as accurate, but it did take about 30 times longer to run. If computational efficiency is important, go with the Circular Kalman filter. If loacation accuracy is important, go with the Particle filter. The improvement in accuracy in the Particle filter is due to the lower variance compared with the Circular Kalman filter, as both responded to changes in angle measurements very quickly.
-
-The researchers shared that due to limitations on reproducing angle-shifted sound accurately, that performance accurate to within approximately $15^{\circ}$ of accuracy is desirable. Of our algorithms, only the Particle filter consistently was within $15^{\circ}$ of accuracy.
-
-
-
-\subsection{Filtering Multiple Angle Estimates}
-
-Since our Kalman Particle observation matrix $H$ allows for an arbitrary amount of 
-simultaneous angles, we tried combining the pairwise microphone angle 
-calculations simply by passing them all into our filters. 
-See Figure \ref{fig:multiple_angles}. 
-While there was some correlation, this model performed worse than the single angles.
- We realized that we have an unmet prerequisite to using Kalman Filter theory: our
-variation is not symmetric. However, 
-if the microphone array were to be symmetric, this method would become viable again.
-
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=.75\textwidth]{actual_paper_graphs/multiple_angles.pdf}\hfill
-    \caption{Filtering various real data with multiple simultaneous angle measurements. The true angle (green) is calculated separately, while the filtered angle (blue) actually comes from multiple individual angle measurements being fed through the single filter.}
-    \label{fig:multiple_angles}
-\end{figure}
-
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=0.6\textwidth]{actual_paper_graphs/gridsearch_particle_filter.pdf}\hfill
-    \caption{Hyperparameter tuning of the Particle filter.}
-    \label{fig:particle_hyperparam}
-\end{figure}
-
-\subsection{Hyperparameter tuning of Most Accurate Filter}
-
-The particle filter has several model parameters as mentioned previously. We performed a grid search
-to find the best filter for the engine dataset, see Figure \ref{fig:particle_hyperparam}.
-
-
-
-
-
-
-
-
+The Circular Kalman and Particle filters both demonstrated significantly improved performance on circular data compared to the naïve Kalman filter. The Particle filter was around twice as accurate across datasets as the Circular Kalman filter, but took about 30 times longer to run. Specifically, the Particle filter performed better in cases of strongly nonlinear behavior. If enough computing headroom is available, the Particle filter is a suitable choice for this application, but the Circular Kalman filter also performed well with very few computations. Only the Particle filter was consistently within the desired $15^{\circ}$ of accuracy on all datasets.
 
 \section{Ethical Considerations}
 This project seeks to augment the safety of those outside the machinery by increasing the awareness of the machine operators. However, before deployment, this model must be 
@@ -295,8 +278,7 @@ it should be emphasized that operators should still use sight and radio communic
 Our goal was to improve robustness of the angle estimation by adapting filtering methods for use with circular data. We derived a very simple modification to the Kalman filter that 
 allows it to work for circular data, and we implemented a particle filter using circular probability distributions. We found the particle filter and the circular Kalman filter suitable 
 for angular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient but suffers in 
-accuracy in cases of strong nonlinearity. Due to the wraparound property of angular data, the unmodified Kalman filter is highly unsuitable for angular data. The particle 
-filter and circular Kalman filter were both suitable, and can be adapted depending on the project’s needs.
+accuracy in cases of strong nonlinearity. Due to the wraparound property of angular data, the unmodified Kalman filter is unsuitable for angular data.
 
 For the BYU Acoustics project specifically, if the computational cost of the filtering step is a concern, we would recommend use of the circular Kalman filter for this project due to its low 
 cost and accurate performance except in cases of strong nonlinearity. If more computational headroom is allowed, the particle filter would be ideal, as it performed well even in cases of 
