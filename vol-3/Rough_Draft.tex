@@ -75,12 +75,10 @@ However, the provided data didn’t include certain extreme scenarios relevant t
 
 %% Third Section 
 \section{Methods}
-We have tried several methods to compute the hidden angle measurement. Through this paper we use degrees in plots and examples, but all the measurements and computations were done in radians. We tried the following methods:
+We utilized several methods to compute the hidden angle measurement. Throughout this paper we use degrees in plots and examples, but all the measurements and computations were done in radians.
 
 \subsection{State Space Model}
-First we had to set up our continuous state space model. We needed angular velocity in our state space so to do that we do a finite difference approximation 
-where $\theta'_t \approx \frac{\theta - \theta_{t-1}}{\Delta t}$. Now that we have angular velocity we can use it to make a simple forward Euler step in our state 
-space. With the finite difference we need to save $\theta_{t-1}$ in the state space. This yields the following setup
+In order to represent the angle evolution over time, we used a state space model that included current angle, previous angle, and angular velocity. In this case, the speaker will either be stationary or moving near a constant velocity, so we did not include an acceleration term. Angular velocity was approximated as $\theta'_t \approx \frac{\theta_{t} - \theta_{t-1}}{\Delta t}$ and $\theta_t$ was approximated using the forward Euler step $\theta_t \approx \Delta t\theta’_{t}$. This yields the following:
 \[\mathbf{x}_t = \begin{pmatrix*}[l]
     \theta_t \\
     \theta_{t-1} \\
@@ -97,21 +95,16 @@ H = \begin{pmatrix*}[l]
     1 & 0 & 0
 
 \end{pmatrix*}\]
- where $H$ is of dimension $n\times3$ for $n$ observed angles. We don't have any control in our situation so our state space is
+ where $H$ is dimension $n\times3$ for $n$ observed angles. The state evolution is
  \[\mathbf{x}_t = F\mathbf{x}_{t-1} + \mathbf{w}_t,\]
-\[\mathbf{z}_t = H\mathbf{x}_t + \mathbf{v}_t\].
+\[\mathbf{z}_t = H\mathbf{x}_t + \mathbf{v}_t.\]
+All of our filters used the same state evolution equations.
 
 \subsection{Kalman Filter}
-We have two different approaches for Kalman Filters. Both originated from the Volume 3 Textbook \cite{V3} and Lab Manual \cite{V3 Lab Manual}. For the rest of this paper we will call the Kalman filter 
-illustrated in the textbooks as the naïve Kalman filter and the one we altered as the circular Kalman filter.
+We implemented two Kalman Filter\cite{V3}\cite{V3 Lab Manual} approaches. We term the Kalman filter illustrated in the textbooks the naïve Kalman filter and the our altered version the circular Kalman filter.
 
 \subsubsection{Naïve Kalman Filter}
-We first implemented an naive Kalman filter based on our state space model, specifically using the efficient form based on Kalman Gain. In the update step of this form, the updated state estimation is computed as follows, 
-where $K_t$ is Kalman Gain and the state is updated as: \[\mathbf{\hat{x}}_t = \mathbf{\hat{x}}_{t|t-1} + K_t(\mathbf{z}_t - H\mathbf{\hat{x}}_{t|t-1}).\] The quantity $\mathbf{z}_t - H\mathbf{\hat{x}}_{t|t-1}$ is the difference between the observation $\mathbf{z}_t$ 
-and expected observation given the predicted state $H\mathbf{\hat{x}}_{t|t-1}$.
-
-The naïve Kalman filter is computing the arithmetic difference while the circular Kalman filter is computing a circular distance by taking into the fact that no two angles are more than
-$180^{\circ}$ apart. This is illustraded with a couple of examples in the table below
+We first implemented a naïve Kalman filter using the efficient Kalman Gain form. In the update step, the state estimation is updated as follows, where $K_t$ is Kalman Gain: \[\mathbf{\hat{x}}_t = \mathbf{\hat{x}}_{t|t-1} + K_t(\mathbf{z}_t - H\mathbf{\hat{x}}_{t|t-1}).\] The quantity $\mathbf{z}_t - H\mathbf{\hat{x}}_{t|t-1}$ is the difference between the observation, $\mathbf{z}_t$, and expected observation given the predicted state, $H\mathbf{\hat{x}}_{t|t-1}$. The naïve Kalman filter computes this as an arithmetic difference, however, it would be more accurate to compute a circular difference, as no two angles are more than $180^{\circ}$ apart. This is illustraded by the examples in the table below:
 
 % TODO fix the spacing on the first row of the table
 \begin{center}
@@ -131,10 +124,7 @@ $180^{\circ}$ apart. This is illustraded with a couple of examples in the table 
 
 
 \subsubsection{Circular Kalman Filter}
-We adapted the Kalman filter for angular data by changing the update step to account for circular arithmetic. Specifically, we changed the calculation of the difference between true 
-observation and predicted observation to ensure that the difference calculated was never greater than $180^{\circ}$ (i.e. measuring the shortest distance around the circle), while preserving 
-sign to account for their position in relation to each other. This computes the circular distance as illustrated in the table. Refer to Algorithm \ref{alg:kalman} to get an idea how this was 
-implemented.
+We adapted the Kalman filter for angular data by changing the aforementioned update step to account for circular arithmetic. Specifically, we changed the calculation of the difference between true and expected observations to ensure that the difference calculated was never greater than $180^{\circ}$ (i.e. measuring the distance between angles on a circle), while preserving sign to account for their relative position. This computes the circular difference illustrated in the table. The new update step is illustrated in Algorithm \ref{alg:kalman}.
 
 
 \begin{algorithm}
@@ -154,9 +144,9 @@ implemented.
 
 \subsection{Particle Filter}
 The second method we employed was another type of Bayesian filter, the particle filter \cite{Particle}. The particle filter employs a large number of possible current states, each referred to 
-as a “particle”. Each particle has an associated weight, interpreted as the probability that particle accurately reflects the hidden state, with all weights summing to 1. As the source can possibly 
+as a “particle”. Each particle has an associated weight, interpreted as the probability that the particle accurately reflects the hidden state. All weights sum to 1 to form a probability distribution. As the source can possibly 
 come in at any angle, we initialize the particles with uniformly distributed states and weights. At each time step, the filter propagates all of the particles forward in time according to the state space 
-model, including adding state noise in the update. Then, using the data, it updates the weights of each particle by computing the posterior probabilities given data. Finally, it computes the state estimate 
+model, including adding state noise in the update step. Then, using the data, it updates the weights of each particle by computing the posterior probabilities given data. Finally, it computes the state estimate 
 as the weighted average of the states of all the particles. 
 
 In the update step, the filter computes $P(\theta|\text{data}) \propto P(\text{data}|\theta)P(\theta)$ for each particle. The prior $P(\theta)$ is given by the particle’s previous weight, while $P(\text{data}|\theta)$ is calculated 
@@ -169,22 +159,22 @@ their sum so they represent a probability distribution.
     \centering
     \includegraphics[width=0.47\textwidth]{actual_paper_graphs/particle_filter_example.pdf}\hfill
     \includegraphics[width=0.47\textwidth]{actual_paper_graphs/von_mises_pdf.pdf}\hfill
-    \caption{On the left, a particle filter example at a given timestep. The particles are colored according to weight, with the heaviest weights clustering around the data angle. On the right, the Von Mises distribution for various shape parameters ($\kappa$).}
+    \caption{Left, an example particle filter at a given timestep. The particles are colored according to weight, with the heaviest weights clustering around the data angle. Right, the Von Mises distribution for various shape parameters ($\kappa$).}
     \label{fig:particle_filter_stuff}
 \end{figure}
 
 Particle filters suffer from what is called the "Degeneracy Problem", in which the weights become concentrated in a small number of the total particles. This is solved by resampling, a process in which low probability particles are replaced 
 with higher probability particles. Detailing this problem and its solution is beyond our scope, but we used the \lstinline{systematic_resample} function from \lstinline{filterpy} to accomplish resampling.
 
-As the particle filter keeps track of a large number of possible states which are distributed around the circle, it is much more flexible to nonlinear behavior. This is desirable in our case, as the source location may possibly reappear at any 
-location in the state space. Unfortunately, the particle filter performs a similar number of computations for each individual particle as the Kalman filter performs in total. As we are using \lstinline{num_particles}, our particle filter takes \lstinline{n_particles} 
+As the particle filter keeps track of a large number of possible states around the circle, it is much more flexible to nonlinear behavior. This is desirable in our case, as a source may possibly reappear at any 
+location in the state space. Unfortunately, the particle filter performs a similar number of computations for each individual particle as the Kalman filter performs in total. As we are using \lstinline{n_particles}, our particle filter takes \lstinline{n_particles} 
 times as long to compute each step.
 
 The Particle filter is defined with the following hyperparameters: 
 \begin{itemize}
-    \item \lstinline{K1} defines the analogous variance term for the distribution of the state noise.
-    \item \lstinline{K2} defines the same for the measurements noise.
-    \item \lstinline{N_particles} defines the number of particles the model employs.
+    \item \lstinline{K1} defines the shape term of the state noise distribution.
+    \item \lstinline{K2} defines the same for the measurement noise distribution.
+    \item \lstinline{n_particles} defines the number of particles the model employs.
     \item \lstinline{N_eff_particles} defines the minimum number of “effective” particles allowed before particles are resampled.
 \end{itemize}
 
@@ -196,14 +186,14 @@ hyperparameters that produced minimum average angular error over the different d
 method was implemented for a robotics research paper as well see \cite{Oops}.
 
 \section{Results and Analysis}
-Here we will first examine our success circular-izing Kalman filters (see Figure \ref{fig:simple_kalman}). 
-Then, we will consider the speed of our filters, followed by their accuracy (see Figures \ref{fig:all_simulated} and \ref{fig:all_real}).
-After that, we will review our unsuccessful attempt to combine many simultaneous angle observations into one computed angle (see Figure \ref{fig:multiple_angles}).
-Finally, we will show results of hyperparameter tuning our Particle filter (see Figure \ref{fig:particle_hyperparam}).
+We first examine the success of the circular Kalman Filter (Figure \ref{fig:simple_kalman}). 
+We then consider the speed and accuracy of the various filters (Figures \ref{fig:all_simulated} and \ref{fig:all_real}).
+Subsequently, we review our unsuccessful attempt at combining many simultaneous angle observations into one estimated angle (Figure \ref{fig:multiple_angles}).
+Finally, we show results of hyperparameter tuning the Particle filter (Figure \ref{fig:particle_hyperparam}).
 
 \subsection{Circular vs Naïve}
-First, we compared the performance of the naive and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
-compared to the naive filter (see Figure \ref{fig:simple_kalman}). The Naive filter tended toward the arithmetic mean of $180^{\circ}$ for walking in a circle, while the circular Kalman filter accurately tracked the source around the entire circle.
+As a simple demonstration, we compared the performance of the naive and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
+compared to the naive filter. The naïve filter tended toward the arithmetic mean of $180^{\circ}$ of the data, while the circular Kalman filter accurately tracked the source around the entire circle. See Figure \ref{fig:simple_kalman} below.
 
 \begin{figure}[htp]
     \centering
@@ -214,8 +204,8 @@ compared to the naive filter (see Figure \ref{fig:simple_kalman}). The Naive fil
 \end{figure}
 
 \subsection{Speed}
-The Kalman filters ran in about $3$ to $5$ miliseconds on about 1 second worth of data. The Particle filter took about $125$ miliseconds on that dataset, so in total about $30$ times longer than the Kalman filters.
-This means that all of our methods can be run in real time. 
+The Kalman filters ran in about 3-5ms on 1 second of data, while the Particle filter took about 125ms, in total about $30$ times longer than the Kalman filters.
+Thus, all of our methods can run in real time. 
 
 
 \begin{figure}[htp]
@@ -225,7 +215,7 @@ This means that all of our methods can be run in real time.
         Running each filter (columns) on various simulated datasets (rows).
         The red dots represent observations of the green true angle. 
         The observations alone are filtered to produce the blue estimate angles.
-        Each run includes average error (E) and the total time taken, in seconds (T).
+        Each cell displays average error (E) and the total time taken, in seconds (T).
         }
     \label{fig:all_simulated}
 \end{figure}
@@ -233,7 +223,7 @@ This means that all of our methods can be run in real time.
 \begin{figure}[htp]
     \centering
     \includegraphics[width=.75\textwidth]{actual_paper_graphs/all_real.pdf}\hfill
-    \caption{Running each filter (columns) on various real datasets (rows). Angles calculated from real microphone-captured sound. The true angle (green) is being filtered (blue).}
+    \caption{Running each filter (columns) on various real datasets (rows). Observation angles calculated using triangulation on recorded sound measurements. The calculated angle (green) is being filtered (blue).}
     \label{fig:all_real}
 \end{figure}
 
