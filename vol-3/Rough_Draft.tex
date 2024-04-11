@@ -14,6 +14,7 @@
 \usetikzlibrary{arrows}
 \usetikzlibrary{tikzmark}
 \usepackage{listings}
+\usepackage{float}
 
 % Define style for Python code snippets
 \lstset{
@@ -215,6 +216,27 @@ compared to the naive filter (see Figure \ref{fig:simple_kalman}). The Naive fil
 \subsection{Speed}
 The Kalman filters ran in about $3$ to $5$ miliseconds on about 1 second worth of data. The Particle filter took about $125$ miliseconds on that dataset, so in total about $30$ times longer than the Kalman filters.
 This means that all of our methods can be run in real time. 
+
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.95\textwidth]{actual_paper_graphs/all_simulated.pdf}\hfill
+    \caption{
+        Running each filter (columns) on various simulated datasets (rows).
+        The red dots represent observations of the green true angle. 
+        The observations alone are filtered to produce the blue estimate angles.
+        Each run includes average error (E) and the total time taken, in seconds (T).
+        }
+    \label{fig:all_simulated}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.75\textwidth]{actual_paper_graphs/all_real.pdf}\hfill
+    \caption{Running each filter (columns) on various real datasets (rows). Angles calculated from real microphone-captured sound. The true angle (green) is being filtered (blue).}
+    \label{fig:all_real}
+\end{figure}
+
 \subsection{Accuracy}
 We used average absolute angle error as our primary evaluation metric. This took the absolute value of the circular distance between the true state and predicted state at each time step and averaged it across time for the whole dataset. The performance of each filter varied depending on the dataset.
 \subsubsection{White Noise at Constant Angle}
@@ -232,6 +254,8 @@ The Circular Kalman and Particle filters both had consistent errors no matter th
 
 The researchers shared that due to limitations on reproducing angle-shifted sound accurately, that performance accurate to within approximately $15^{\circ}$ of accuracy is desirable. Of our algorithms, only the Particle filter consistently was within $15^{\circ}$ of accuracy.
 
+
+
 \subsection{Filtering Multiple Angle Estimates}
 
 Since our Kalman Particle observation matrix $H$ allows for an arbitrary amount of 
@@ -243,45 +267,32 @@ While there was some correlation, this model performed worse than the single ang
 variation is not symmetric. However, 
 if the microphone array were to be symmetric, this method would become viable again.
 
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.75\textwidth]{actual_paper_graphs/multiple_angles.pdf}\hfill
+    \caption{Filtering various real data with multiple simultaneous angle measurements. The true angle (green) is calculated separately, while the filtered angle (blue) actually comes from multiple individual angle measurements being fed through the single filter.}
+    \label{fig:multiple_angles}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{actual_paper_graphs/gridsearch_particle_filter.pdf}\hfill
+    \caption{Hyperparameter tuning of the Particle filter.}
+    \label{fig:particle_hyperparam}
+\end{figure}
+
 \subsection{Hyperparameter tuning of Most Accurate Filter}
 
 The particle filter has several model parameters as mentioned previously. We performed a grid search
 to find the best filter for the engine dataset, see Figure \ref{fig:particle_hyperparam}.
 
 
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=.95\textwidth]{actual_paper_graphs/all_simulated.pdf}\hfill
-    \caption{
-        Filtering simulated datasets. Each row is a dataset, 
-        and each column is a type of filter.
-        The red dots represent observations of the green true angle. 
-        The observations alone are filtered to produce the blue estimate angles.
-        Each run includes average error (E) and the total time taken, in seconds (T).
-        }
-    \label{fig:all_simulated}
-\end{figure}
 
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=.95\textwidth]{actual_paper_graphs/all_real.pdf}\hfill
-    \caption{Filtering angles calculated from real microphone-captured sound. Each row is a dataset, and each column is a type of filter. The true angle (green) is being filtered (blue).}
-    \label{fig:all_real}
-\end{figure}
 
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=.95\textwidth]{actual_paper_graphs/multiple_angles.pdf}\hfill
-    \caption{Filtering real data with multiple simultaneous angle measurements. Each row is a dataset, and each column is a type of filter. The true angle (green) is calculated separately, while the filtered angle (blue) actually comes from multiple individual angle measurements being fed through the single filter.}
-    \label{fig:multiple_angles}
-\end{figure}
 
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=1\textwidth]{actual_paper_graphs/gridsearch_particle_filter.pdf}\hfill
-    \caption{Hyperparameter tuning of the Particle filter.}
-    \label{fig:particle_hyperparam}
-\end{figure}
+
+
+
 
 \section{Ethical Considerations}
 This project seeks to augment the safety of those outside the machinery by increasing the awareness of the machine operators. However, before deployment, this model must be 
