@@ -74,7 +74,7 @@ However, the provided data didn’t include certain extreme scenarios relevant t
 
 %% Third Section 
 \section{Methods}
-We have tried several methods to compute the hidden angle measurement. Through this paper we use degrees in plots and examples, but all the measurements and computations were done in radians. We tried the following methods...
+We have tried several methods to compute the hidden angle measurement. Through this paper we use degrees in plots and examples, but all the measurements and computations were done in radians. We tried the following methods:
 
 \subsection{State Space Model}
 First we had to set up our continuous state space model. We needed angular velocity in our state space so to do that we do a finite difference approximation 
@@ -195,7 +195,10 @@ hyperparameters that produced minimum average angular error over the different d
 method was implemented for a robotics research paper as well see \cite{Oops}.
 
 \section{Results and Analysis}
-Here is a breakdown of the speed and accuracy of each filter (see Figures \ref{fig:all_simulated} and \ref{fig:all_real}).
+Here we will first examine our success circular-izing Kalman filters (see Figure \ref{fig:simple_kalman}). 
+Then, we will consider the speed of our filters, followed by their accuracy (see Figures \ref{fig:all_simulated} and \ref{fig:all_real}).
+After that, we will review our unsuccessful attempt to combine many simultaneous angle observations into one computed angle (see Figure \ref{fig:multiple_angles}).
+Finally, we will show results of hyperparameter tuning our Particle filter (see Figure \ref{fig:particle_hyperparam}).
 
 \subsection{Circular vs Naïve}
 First, we compared the performance of the naive and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
@@ -217,7 +220,7 @@ We used average absolute angle error as our primary evaluation metric. This took
 \subsubsection{White Noise at Constant Angle}
 On the White Noise dataset, the Particle filter was the best filter, with about half the error of the Kalman filters. The error for the Kalman filters was almost exactly the same (.367 for Noncircular and .369 for Circular), which makes sense because the wraparound algorithm in the Circular Kalman filter was not used, making it behave exactly like the unmodified Kalman filter.
 \subsubsection{Constant Angle with Engine Noise}
-The Particle filter performed the best again on this data set, however the imporovement over the Kalman filters was not as large as it was with the White Noise data set. The error of the Particle filter was $\approx 25\%$ lower than the unmodified Kalman filter and was $\approx 40\%$ lower than the Circular Kalman filter. It is interesting to note that the unmodified Kalman filter performed significantly better than the Circular Kalman filter on this data set.
+The Particle filter performed the best again on this data set, however the improvement over the Kalman filters was not as large as it was with the White Noise data set. The error of the Particle filter was $\approx 25\%$ lower than the unmodified Kalman filter and was $\approx 40\%$ lower than the Circular Kalman filter. It is interesting to note that the unmodified Kalman filter performed significantly better than the Circular Kalman filter on this data set.
 \subsubsection{Switching}
 This is an artificial dataset created to simulate jumping between angles across $0^{\circ}$. The Naïve Kalman filter performed poorly on this dataset. The Circular Kalman and Particle filters performed much better, with the Particle filter being twice as accurate ($\mathrm{E}=0.199$ vs $\mathrm{E}=.392$) as the Circular Kalman filter.
 \subsubsection{With Jump}
@@ -228,6 +231,17 @@ The results of this dataset are the same as the previous dataset.
 The Circular Kalman and Particle filters both had consistent errors no matter the data set. The real trade off is whether we care more about speed or performance. The Particle filter was around twice as accurate, but it did take about 30 times longer to run. If computational efficiency is important, go with the Circular Kalman filter. If loacation accuracy is important, go with the Particle filter. The improvement in accuracy in the Particle filter is due to the lower variance compared with the Circular Kalman filter, as both responded to changes in angle measurements very quickly.
 
 The researchers shared that due to limitations on reproducing angle-shifted sound accurately, that performance accurate to within approximately $15^{\circ}$ of accuracy is desirable. Of our algorithms, only the Particle filter consistently was within $15^{\circ}$ of accuracy.
+
+\subsection{Filtering Multiple Angle Estimates}
+
+Since our Kalman Particle observation matrix $H$ allows for an arbitrary amount of 
+simultaneous angles, we tried combining the pairwise microphone angle 
+calculations simply by passing them all into our filters. 
+See Figure \ref{fig:multiple_angles}. 
+While there was some correlation, this model performed worse than the single angles.
+ We realized that we have an unmet prerequisite to using Kalman Filter theory: our
+variation is not symmetric. However, 
+if the microphone array were to be symmetric, this method would become viable again.
 
 \subsection{Hyperparameter tuning of Most Accurate Filter}
 
