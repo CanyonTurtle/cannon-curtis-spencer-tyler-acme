@@ -32,7 +32,7 @@
 
 
 \begin{document}
-\title{Navigation to Arrakis using Slingshot}
+\title{Helping the Spacing Guild Navigate to Arrakis}
 \author{Cannon Tuttle, Curtis Evans, Spencer Ashton, Tyler Sanders}
 
 %% comment out next command to put today's date after names of group members, or put a desired day in the parethesis
@@ -52,11 +52,10 @@ would be to see if they have enough feasible fuel with that optimal control. Sin
 Earth, to other planets in their own solar system. 
 
 \section{State Equations}
-We derived our state equations using kepler's law of motion.
+We used Newton's second law of motion $F=ma$ to arrive at our state equations where $m_p$ is the mass of the planet, $\mathbf{x}_s$ is the $x$ and $y$ position of the space ship, and $\mathbf{x}_p$ is the $x$
+and $y$ position of the planet, and $\mathbf{u}$ is the acceleration in the $x$ and $y$ direction for the spaceship. \textcolor{red}{TODO} talk about what $G$ is and how this equation makes sense.
 \[\ddot{\mathbf{x}} = -G\sum_{p\in{P}}^{}\frac{m_p}{||\mathbf{x}_s-\mathbf{x}_p||_2^3}(\mathbf{x}_s-\mathbf{x}_p) + \mathbf{u}\]
-And the following cost functional
-\[J[u] = \int_{0}^{t_f}||\mathbf{u}||_2^2dt\]
-The following state equation
+Converting $\ddot{\mathbf{x}}$ into a first order differential equation we get the following state equation. 
 \[\begin{pmatrix}
     \dot{x}_s \\
     \dot{y}_s \\
@@ -68,6 +67,18 @@ The following state equation
     -G\sum_{p\in{P}}^{}\frac{m_p(x_s - x_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_x \\
     -G\sum_{p\in{P}}^{}\frac{m_p(y_s - y_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_y
 \end{pmatrix}\]
+
+We decided to minimize the control used to get the optimal fuel usage. That gives us the following cost functional. 
+\[J[u] = \int_{0}^{t_f}||\mathbf{u}||_2^2dt\]
+
+We are now ready to use Pontryagin's maximum principle with 
+\[H = \mathbf{p}\cdot\mathbf{f(\mathbf{x})} - L\]
+\[= p_1\dot{x}_s + p_2\dot{y}_s + p_3(-G\sum_{p\in{P}}^{}\frac{m_p(x_s - x_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_x)\]
+\[+ p_4(-G\sum_{p\in{P}}^{}\frac{m_p(y_s - y_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_y) - u_x^2 - u_y^2\]
+
+This give us the following co-state evolution equations
+\[\dot{p}_1 = -\frac{\partial H}{\partial x_s}\]
+
 
 
 
@@ -85,12 +96,8 @@ The following state equation
 
 %% If not using bibtex, comment out the previous two lines and uncomment those below
 \begin{thebibliography}{99}
-\bibitem{Research} G. Kurz, I. Gilitschenski and U. D. Hanebeck, "Recursive nonlinear filtering for angular data based on circular distributions," \textit{2013 American Control Conference}, Washington, DC, USA, 2013, pp. 5439-5445, doi: 10.1109/ACC.2013.6580688.
-\bibitem{V3} The ACME Volume 3 Textbook
-\bibitem{V3 Lab Manual} J. Humpherys and T. Jarvis, "Labs for Foundations of Applied Mathematics, Volume 3, Modeling with Uncertainty and Data."
-\bibitem{Particle} Labbe, Roger. “Kalman and Bayesian Filters in Python”.
-\bibitem{Risk} Masson, Maxime; Lamoureux, Julie; de Guise, Elaine (October 2019). "Self-reported risk-taking and sensation-seeking behavior predict helmet wear amongst Canadian ski and snowboard instructors". \textit{Canadian Journal of Behavioural Science.} 52 (2): 121–130. doi:10.1037/cbs0000153. S2CID 210359660.
-\bibitem{Oops} I. Marković and I. Petrović, "Speaker localization and tracking with a microphone array on a mobile robot using von Mises distribution and particle filtering," \textit{Robotics and Autonomous Systems}, Volume 58, Issue 11, 2010, pp. 1185-1196, doi: 10.1016/j.robot.2010.08.001
+\bibitem{Newton} William M., Samuel L., Jeff S. University Physics Volume 1. 2021 OpenStax. https://openstax.org/details/books/university-physics-volume-1 
+
 \end{thebibliography}
 
 \end{document}
