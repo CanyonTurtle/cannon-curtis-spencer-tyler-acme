@@ -252,21 +252,27 @@ to find the best filter for the engine dataset, see Figure \ref{fig:particle_hyp
 \begin{figure}[htp]
     \centering
     \includegraphics[width=.95\textwidth]{actual_paper_graphs/all_simulated.pdf}\hfill
-    \caption{All filters, run on simulated datasets. Each row is a dataset, and each column is a type of filter. The red dots represent observations of the green true angle. The observations alone are filtered to produce the blue estimate angles.}
+    \caption{
+        Filtering simulated datasets. Each row is a dataset, 
+        and each column is a type of filter.
+        The red dots represent observations of the green true angle. 
+        The observations alone are filtered to produce the blue estimate angles.
+        Each run includes average error (E) and the total time taken, in seconds (T).
+        }
     \label{fig:all_simulated}
 \end{figure}
 
 \begin{figure}[htp]
     \centering
     \includegraphics[width=.95\textwidth]{actual_paper_graphs/all_real.pdf}\hfill
-    \caption{All filters run on angles calculated from real microphone-captured sound. Each row is a dataset, and each column is a type of filter. The true angle (green) is being filtered (blue).}
+    \caption{Filtering angles calculated from real microphone-captured sound. Each row is a dataset, and each column is a type of filter. The true angle (green) is being filtered (blue).}
     \label{fig:all_real}
 \end{figure}
 
 \begin{figure}[htp]
     \centering
     \includegraphics[width=.95\textwidth]{actual_paper_graphs/multiple_angles.pdf}\hfill
-    \caption{All filters, run on real data with multiple simultaneous angle measurements. Each row is a dataset, and each column is a type of filter. The true angle (green) is calculated separately, while the filtered angle (blue) actually comes from multiple individual angle measurements being fed through the single filter.}
+    \caption{Filtering real data with multiple simultaneous angle measurements. Each row is a dataset, and each column is a type of filter. The true angle (green) is calculated separately, while the filtered angle (blue) actually comes from multiple individual angle measurements being fed through the single filter.}
     \label{fig:multiple_angles}
 \end{figure}
 
