@@ -39,7 +39,9 @@
 \date{\today}
 
 \begin{abstract}
-    
+    We find the optimal path and control of navigating from one planet to another planet by using the laws of gravity to help with 
+    the acceleration. This is done by using Pontryagin maximum principle, and we discovered sensitivity in our system when optimizing over $t_f$ and found a solution to numerical instabilty when 
+    adding massive planets such as the sun. 
 \end{abstract}
 
 \maketitle
@@ -47,7 +49,7 @@
 %% First Section
 \section{Problem Statement and Motivation}
 The \textbf{Dune} Guild Naviators are tasked with delivering House Atreides from the planet Caladan to Arrakis. Usually they solve the optimal control in their mind while taking spice, but since spice production
-has been disrupted they've instead decided to turn to ACME students on Earth to solve the optimal control for them. They have asked the ACME students to find the best path while minimizing fuel consumption.
+has been disrupted they've instead decided to turn to ACME students on Earth to solve the optimal control for them. They have asked the ACME students to find the best path while minimizing fuel consumption. 
 
 
 \section{State Equations}
@@ -84,17 +86,59 @@ This give us the following co-state evolution equations by using $\mathbf{p}' = 
     \dot{p}_2 &= p_4G[\sum_{p\in{P}}^{}\frac{m_p}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} - \frac{3m_p(y_s - y_p)^2}{((x_s-x_p)^2+(y_s-y_p)^2)^{5/2}}] \\
     \dot{p}_3 &= -p_1 \\
     \dot{p}_4 &= -p_2. \\
-    p_1&(t_f)= p_2(t_f) = 0 = p_3(tf) = p_4(t_f)
+    p_1&(t_f)= p_2(t_f) = 0 = p_3(t_f) = p_4(t_f)
 \end{align*}
 Now we need to find $\tilde{\mathbf{u}}$ by maximizing the Hamiltonian which gives us the following
 \[\tilde{u}_x = \frac{p_3}{2} \:\:\text{and}\:\: \tilde{u}_y = \frac{p_4}{2}.\]
 
 
-We now have a system of differential equations that can be solved using \textcolor{red}{TODO} solve\_bvp.
+The system of differential equations is now set up by plugging $u_x$ and $u_y$ back into the evolution equation. This problem is now set up to use \lstinline{solve_bvp}.
 
-\subsection{Planetary Motion}
-Since the ACME students aren't familiar with the planetary motion of Arrakis and Caladan they decided to look at getting from Mars to Earth with their respective masses and orbits.
-We have made a planet class that will give us the planets mass, position, and velocity.
+\section{Planetary Motion}
+Our first task was figuring out how to insert planets into our system. We needed to have have a time dependent function that would give us the planet's position and velocity. 
+
+\section{Goals}
+We hope to acheive an optimal path from Caladan to Arrakis with a fixed final time, a free final time where we need $H(t_f) = 0$ as an added boundary condition, and an optimal control
+with multiple solar systems and planets. We also want to figure out the best path with a given arbitrary layout for a given solar system. Essentially the Spacing Guild would like to use 
+our algorithms to help navigate from any planet. \textcolor{red}{TODO} should we talk about optimizing over $t_0$ if so we should say. We realize that in planetary travel we would like to 
+get to a given planet on a fixed day and then leave our leaving day free. That would mean we are optimixing over $t_0$ so we would have a free parameter with the added boundary condition that
+$H(t_0) = 0$.
+
+
+\section{Simulations}
+We simulated our model using the inner planets of our own solar system, but changed the names to be planets from the \textbf{Dune} universe so the Guild Naviators wouldn't be confused.
+The first model we ran was without the sun and a fixed final time of $200$ Earth days (See Figure \ref{fig:fixed_time_no_sun}). 
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{f2.png}\hfill
+    \caption{Going from Caladan to Arrakis in 200 Earth Days with a fixed final time}
+    \label{fig:fixed_time_no_sun}
+\end{figure}
+
+Our bare bones model got us from Caladan to Arrakis successfully, but we would like to save as much fuel as possible so our main goal is to minimize over $t_f$ as well. This was done by 
+adding a free parameter in \lstinline{solve_bvp} and adding the boundary condition of $H(t_f) = 0$. We discovered that this model was sensitive to initial guess of $t_f$ and also the initial
+state space guess. We ran model with varying $t_f$ guesses and got varying results with no convergence on an optimal $t_f$ for all the different guesses (See Figure \ref{fig:free_final_time_no_sun}). 
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{f5.png}\hfill
+    \caption{Going from Caladan to Arrakis with $t_f$ guess as $365$ days. The optimal $t_f$ was $344$ days.}
+    \label{fig:free_time_no_sun}
+\end{figure}
+
+We needed to add the sun, but the problem became unstable due the massive size of the sun (See Figure \ref{fixed_time_sun}). One suggestion we had was to work in logspace and we also changed how 
+we were computing the norm in the denominator. We were using a simple function that was computing the norm from the formula, but instead we started using \lstinline{scipy.linalg.norm}. These two changes 
+solved the instability problem.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{f5.png}\hfill
+    \caption{Going from Caladan to Arrakis with $t_f$ guess as $365$ days. The optimal $t_f$ was $344$ days.}
+    \label{fig:free_time_no_sun}
+\end{figure}
+
+
 
 
 
