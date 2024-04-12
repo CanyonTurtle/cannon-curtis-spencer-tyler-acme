@@ -46,10 +46,9 @@
 
 %% First Section
 \section{Problem Statement and Motivation}
-The Guild Navigators tasked with delivering House Atreides to Arrakis are unsure what the best path is to get from Caladan to Arrakis, but they know of a planet in another universe, Earth, where there 
-are smart ACME students learning about optimal control. They want to be able to figure out with a given travel time what the optimal path and control is, and they want to know what the optimal final time 
-would be to see if they have enough feasible fuel with that optimal control. Since the ACME students are from another universe and solar system they have decided to focus on getting from their home planet, 
-Earth, to other planets in their own solar system. 
+The \textbf{Dune} Guild Naviators are tasked with delivering House Atreides from the planet Caladan to Arrakis. Usually they solve the optimal control in their mind while taking spice, but since spice production
+has been disrupted they've instead decided to turn to ACME students on Earth to solve the optimal control for them. They have asked the ACME students to find the best path while minimizing fuel consumption.
+
 
 \section{State Equations}
 We used Newton's second law of motion $F=ma$ to arrive at our state equations where $m_p$ is the mass of the planet, $\mathbf{x}_s$ is the $x$ and $y$ position of the space ship, and $\mathbf{x}_p$ is the $x$
@@ -68,18 +67,34 @@ Converting $\ddot{\mathbf{x}}$ into a first order differential equation we get t
     -G\sum_{p\in{P}}^{}\frac{m_p(y_s - y_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_y
 \end{pmatrix}\]
 
-We decided to minimize the control used to get the optimal fuel usage. That gives us the following cost functional. 
+We decided to minimize the control used to get the optimal fuel usage. That gives us the following cost functional and boundary conditions. 
 \[J[u] = \int_{0}^{t_f}||\mathbf{u}||_2^2dt\]
+\[\mathbf{x}_s(0) = \text{Caladan's Position},\: \dot{\mathbf{x}}_s(0) = \text{Caladan's Velocity}\]
+\[\mathbf{x}_s(t_f) = \text{Arrakis' Position},\: \dot{\mathbf{x}}_s(t_f) = \text{Arrakis' Velocity}\]
 
 We are now ready to use Pontryagin's maximum principle with 
 \[H = \mathbf{p}\cdot\mathbf{f(\mathbf{x})} - L\]
-\[= p_1\dot{x}_s + p_2\dot{y}_s + p_3(-G\sum_{p\in{P}}^{}\frac{m_p(x_s - x_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_x)\]
+Applying this to our state equation and Lagrangian we get the following Hamiltonian.
+\[H = p_1\dot{x}_s + p_2\dot{y}_s + p_3(-G\sum_{p\in{P}}^{}\frac{m_p(x_s - x_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_x)\]
 \[+ p_4(-G\sum_{p\in{P}}^{}\frac{m_p(y_s - y_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_y) - u_x^2 - u_y^2\]
 
-This give us the following co-state evolution equations
-\[\dot{p}_1 = -\frac{\partial H}{\partial x_s}\]
+This give us the following co-state evolution equations by using $\mathbf{p}' = \frac{DH}{D\mathbf{x}}$
+\begin{align*}
+    \dot{p}_1 &= p_3G[\sum_{p\in{P}}^{}\frac{m_p}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} - \frac{3m_p(x_s - x_p)^2}{((x_s-x_p)^2+(y_s-y_p)^2)^{5/2}}] \\
+    \dot{p}_2 &= p_4G[\sum_{p\in{P}}^{}\frac{m_p}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} - \frac{3m_p(y_s - y_p)^2}{((x_s-x_p)^2+(y_s-y_p)^2)^{5/2}}] \\
+    \dot{p}_3 &= -p_1 \\
+    \dot{p}_4 &= -p_2. \\
+    p_1&(t_f)= p_2(t_f) = 0 = p_3(tf) = p_4(t_f)
+\end{align*}
+Now we need to find $\tilde{\mathbf{u}}$ by maximizing the Hamiltonian which gives us the following
+\[\tilde{u}_x = \frac{p_3}{2} \:\:\text{and}\:\: \tilde{u}_y = \frac{p_4}{2}.\]
 
 
+We now have a system of differential equations that can be solved using \textcolor{red}{TODO} solve\_bvp.
+
+\subsection{Planetary Motion}
+Since the ACME students aren't familiar with the planetary motion of Arrakis and Caladan they decided to look at getting from Mars to Earth with their respective masses and orbits.
+We have made a planet class that will give us the planets mass, position, and velocity.
 
 
 
