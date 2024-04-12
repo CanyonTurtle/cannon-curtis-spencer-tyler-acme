@@ -33,14 +33,14 @@
 
 
 \begin{document}
-\title{Adapting Bayesian Filters for use with Angular Data}
+\title{Adapting Bayesian Filters for use with Circular Data}
 \author{Cannon Tuttle, Curtis Evans, Spencer Ashton, Tyler Sanders}
 
 %% comment out next command to put today's date after names of group members, or put a desired day in the parethesis
 \date{\today}
 
 \begin{abstract}
-We adapt Bayesian filtering methods for use with angular data. We focus on a specific acoustics application, but accurate angle estimation is crucial in several fields. Due to the wrapping property of angular data, traditional filters are unsuitable for filtering angular data. We employ a simple continuous state-space model and successfully adapt the Kalman and Particle filters to account for the nature of circular data. We test these methods on both simulated and real data, finding our filters to perform far superior to an unmodified Kalman filter.
+We adapt Bayesian filtering methods for use with circular data. We focus on a specific acoustics application, but accurate angle estimation is crucial in several fields. Due to the wrapping property of circular data, traditional filters are unsuitable for filtering circular data. We employ a simple continuous state-space model and successfully adapt the Kalman and Particle filters to account for the nature of circular data. We test these methods on both simulated and real data, finding our filters to perform far superior to an unmodified Kalman filter.
 \vspace{-\baselineskip}
 \end{abstract}
 \vspace{-\baselineskip}
@@ -57,7 +57,7 @@ In order to replicate the directionality of the sound, the angle of arrival of t
 \label{fig:array}
 \end{figure}
 
-Our aim is to improve the robustness of the angle estimation in order to allow the researchers to more accurately reproduce the sound directionality. Previous work has shown that an unmodified Kalman Filter does not work well on angular data\cite{Research}. Various distributions, including a wrapped normal distribution and the Von Mises distribution have been successfully implemented to be used with Kalman type filters. However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture \cite{Research}. Particle filters have shown to be useful for filtering angle data, for example in robotics\cite{Oops}.
+Our aim is to improve the robustness of the angle estimation in order to allow the researchers to more accurately reproduce the sound directionality. Previous work has shown that an unmodified Kalman Filter does not work well on circular data\cite{Research}. Various distributions, including a wrapped normal distribution and the Von Mises distribution have been successfully implemented to be used with Kalman type filters. However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture \cite{Research}. Particle filters have shown to be useful for filtering angle data, for example in robotics\cite{Oops}.
 
 We modeled the angle of arrival evolution process as a continuous state space model and employed various Bayesian filtering techniques in order to optimize the angle estimation. This included adapting Kalman filters, normally used with data defined for all real numbers and gaussian distributed noise, to work with circular data that are defined on $[0,2\pi]$ with the wrapping property at the boundary. We also adapted a Particle filter, a type of Bayesian filter that allows for the use of an arbitrary distribution, for use with circular probability distributions.
 
@@ -68,7 +68,7 @@ However, the provided data didn’t include certain extreme scenarios relevant t
 
 %% Third Section 
 \section{Methods}
-We utilized several methods to compute the hidden angle measurement. Throughout this paper we use degrees in plots and examples, but all the measurements and computations were done in radians.
+We utilized several methods to compute the hidden angle measurement. Throughout this paper we use degrees in plots and examples, but all the measurements and computations were done in radians. We also used the average absolute angle error as our primary evaluation metric. This took the average of the absolute value of the circular distance between the true state and predicted state at each time step across the whole dataset.
 
 \subsection{State Space Model}
 In order to represent the angle evolution over time, we used a state space model that included current angle, previous angle, and angular velocity. In this case, the speaker will either be stationary or moving near a constant velocity, so we did not include an acceleration term. Angular velocity was approximated as $\theta'_t \approx \frac{\theta_{t} - \theta_{t-1}}{\Delta t}$ and $\theta_t$ was approximated using the forward Euler step $\theta_t \approx \Delta t\theta’_{t}$. This yields the following:
@@ -117,7 +117,7 @@ We first implemented a naïve Kalman filter using the efficient Kalman Gain form
 
 
 \subsubsection{Circular Kalman Filter}
-We adapted the Kalman filter for angular data by changing the aforementioned update step to account for circular arithmetic. Specifically, we changed the calculation of the difference between true and expected observations to ensure that the difference calculated was never greater than $180^{\circ}$ (i.e. measuring the distance between angles on a circle), while preserving sign to account for their relative position. This computes the circular difference illustrated in the table. The new update step is illustrated in Algorithm \ref{alg:kalman}.
+We adapted the Kalman filter for circualr data by changing the aforementioned update step to account for circular arithmetic. Specifically, we changed the calculation of the difference between true and expected observations to ensure that the difference calculated was never greater than $180^{\circ}$ (i.e. measuring the distance between angles on a circle), while preserving sign to account for their relative position. This computes the circular difference illustrated in the table. The new update step is illustrated in Algorithm \ref{alg:kalman}.
 
 
 \begin{algorithm}
@@ -172,7 +172,7 @@ The Particle filter is defined with the following hyperparameters:
 \end{itemize}
 
 We tuned the aforementioned hyperparameters by performing a
-gridsearch over several different possible values. A filter was constructed for each hyperparameter
+gridsearch over several different possible values using the average absolute angle error. A filter was constructed for each hyperparameter
 combination, with its performance tested across multiple datasets. We then chose the
 model that produced minimum average angular error over the different datasets (see Figure \ref{fig:particle_hyperparam}). This filter had the parameters \lstinline{K1} = 3, \lstinline{K1} = 2, \lstinline{n_particles} = 250, and \lstinline{n_eff_particles} = 10.
 
@@ -237,7 +237,7 @@ Thus, all of our filters can run in real time.
 \end{figure}
 
 \subsection{Accuracy}
-We used average absolute angle error as our primary evaluation metric. This took the absolute value of the circular distance between the true state and predicted state at each time step and averaged it across time for the whole dataset. The performance of each filter varied depending on the dataset.
+We focused on the accuracy of the following situations.
 \subsubsection{White Noise at Constant Angle}
 On the White Noise dataset, the Particle filter was the best filter, with about half the error of the Kalman filters. The error for the Kalman filters was almost exactly the same (.367 for Noncircular and .369 for Circular), which makes sense because the wraparound algorithm in the Circular Kalman filter was not used, making it behave exactly like the unmodified Kalman filter.
 \subsubsection{Constant Angle with Engine Noise}
@@ -261,8 +261,8 @@ it should be emphasized that operators should still use sight and radio communic
 \section{Conclusion}
 Our goal was to improve robustness of the angle estimation by adapting filtering methods for use with circular data. We derived a very simple modification to the Kalman filter that 
 allows it to work for circular data, and we implemented a particle filter using circular probability distributions. We found the particle filter and the circular Kalman filter suitable 
-for angular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient has its 
-accuracy suffer in cases of strong nonlinearity. Due to the wraparound property of angular data, the naïve Kalman filter is unsuitable for angular data.
+for circular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient has its 
+accuracy suffer in cases of strong nonlinearity. Due to the wraparound property of circular data, the naïve Kalman filter is unsuitable for circular data.
 
 For the BYU Acoustics project specifically, if the computational cost of the filtering step is a concern, we would recommend use of the circular Kalman filter for this project due to its low 
 cost and accurate performance except in cases of strong nonlinearity. If more computational headroom is allowed, the particle filter would be ideal, as it performed well even in cases of 
@@ -283,7 +283,7 @@ methods can easily be modified to adjust accuracy, flexibility, and computationa
 
 %% If not using bibtex, comment out the previous two lines and uncomment those below
 \begin{thebibliography}{99}
-\bibitem{Research} G. Kurz, I. Gilitschenski and U. D. Hanebeck, "Recursive nonlinear filtering for angular data based on circular distributions," \textit{2013 American Control Conference}, Washington, DC, USA, 2013, pp. 5439-5445, doi: 10.1109/ACC.2013.6580688.
+\bibitem{Research} G. Kurz, I. Gilitschenski and U. D. Hanebeck, "Recursive nonlinear filtering for circular data based on circular distributions," \textit{2013 American Control Conference}, Washington, DC, USA, 2013, pp. 5439-5445, doi: 10.1109/ACC.2013.6580688.
 \bibitem{V3} The ACME Volume 3 Textbook
 \bibitem{V3 Lab Manual} J. Humpherys and T. Jarvis, "Labs for Foundations of Applied Mathematics, Volume 3, Modeling with Uncertainty and Data."
 \bibitem{Particle} Labbe, Roger. “Kalman and Bayesian Filters in Python”.
