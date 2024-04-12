@@ -33,19 +33,17 @@
 
 
 \begin{document}
-\title{Adapting Bayesian Filters for use of Angular Data}
+\title{Adapting Bayesian Filters for use with Angular Data}
 \author{Cannon Tuttle, Curtis Evans, Spencer Ashton, Tyler Sanders}
 
 %% comment out next command to put today's date after names of group members, or put a desired day in the parethesis
 \date{\today}
 
 \begin{abstract}
-    This paper attempts to adapt linear filtering methods to work with angular data in order to predict angle of arrival of human voices. The data used for this 
-    project was both simulated and real data. We used various Bayesian filtering techniques on a continuous state space model to optimize angle estimation. We had
-    success with a particle filter and a circular Kalman filter.
+We adapt Bayesian filtering methods for use with angular data. We focus on a specific acoustics application, but accurate angle estimation is crucial in several fields. Due to the wrapping property of angular data, traditional filters are unsuitable for filtering angular data. We employ a simple continuous state-space model and successfully adapt the Kalman and Particle filters to account for the nature of circular data. We test these methods on both simulated and real data, finding our filters to perform far superior to an unmodified Kalman filter.
 \vspace{-\baselineskip}
 \end{abstract}
-
+\vspace{-\baselineskip}
 \maketitle
 \vspace{-\baselineskip}
 \section{Problem Statement and Motivation}
@@ -176,8 +174,7 @@ The Particle filter is defined with the following hyperparameters:
 We tuned the aforementioned hyperparameters by performing a
 gridsearch over several different possible values. A filter was constructed for each hyperparameter
 combination, with its performance tested across multiple datasets. We then chose the
-model that produced minimum average angular error over the different datasets.
- see Figure \ref{fig:particle_hyperparam}.
+model that produced minimum average angular error over the different datasets (see Figure \ref{fig:particle_hyperparam}). This filter had the parameters \lstinline{K1} = 3, \lstinline{K1} = 2, \lstinline{n_particles} = 250, and \lstinline{n_eff_particles} = 10.
 
 \begin{figure}[htp]
     \centering
@@ -264,8 +261,8 @@ it should be emphasized that operators should still use sight and radio communic
 \section{Conclusion}
 Our goal was to improve robustness of the angle estimation by adapting filtering methods for use with circular data. We derived a very simple modification to the Kalman filter that 
 allows it to work for circular data, and we implemented a particle filter using circular probability distributions. We found the particle filter and the circular Kalman filter suitable 
-for angular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient but suffers in 
-accuracy in cases of strong nonlinearity. Due to the wraparound property of angular data, the unmodified Kalman filter is unsuitable for angular data.
+for angular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient has its 
+accuracy suffer in cases of strong nonlinearity. Due to the wraparound property of angular data, the naïve Kalman filter is unsuitable for angular data.
 
 For the BYU Acoustics project specifically, if the computational cost of the filtering step is a concern, we would recommend use of the circular Kalman filter for this project due to its low 
 cost and accurate performance except in cases of strong nonlinearity. If more computational headroom is allowed, the particle filter would be ideal, as it performed well even in cases of 
