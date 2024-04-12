@@ -68,7 +68,7 @@ However, the provided data didn’t include certain extreme scenarios relevant t
 
 %% Third Section 
 \section{Methods}
-We utilized several methods to compute the hidden angle measurement. Throughout this paper we use degrees in plots and examples, but all the measurements and computations were done in radians. We also used the average absolute angle error as our primary evaluation metric. This took the average of the absolute value of the circular distance between the true state and predicted state at each time step across the whole dataset.
+We utilized several methods to compute the hidden angle measurement. Throughout this paper we use degrees in plots and examples, but all the measurements and computations were done in radians. 
 
 \subsection{State Space Model}
 In order to represent the angle evolution over time, we used a state space model that included current angle, previous angle, and angular velocity. In this case, the speaker will either be stationary or moving near a constant velocity, so we did not include an acceleration term. Angular velocity was approximated as $\theta'_t \approx \frac{\theta_{t} - \theta_{t-1}}{\Delta t}$ and $\theta_t$ was approximated using the forward Euler step $\theta_t \approx \Delta t\theta’_{t}$. This yields the following:
@@ -172,22 +172,26 @@ The Particle filter is defined with the following hyperparameters:
 \end{itemize}
 
 We tuned the aforementioned hyperparameters by performing a
-gridsearch over several different possible values using the average absolute angle error. A filter was constructed for each hyperparameter
+gridsearch over several different possible values using the metrics discussed below. A filter was constructed for each hyperparameter
 combination, with its performance tested across multiple datasets. We then chose the
-model that produced minimum average angular error over the different datasets (see Figure \ref{fig:particle_hyperparam}). This filter had the parameters \lstinline{K1} = 3, \lstinline{K1} = 2, \lstinline{n_particles} = 250, and \lstinline{n_eff_particles} = 10.
+model that produced minimum average circular error over the different datasets (see Figure \ref{fig:particle_hyperparam}). This filter had the parameters \lstinline{K1} = 3, \lstinline{K2} = 5, \lstinline{n_particles} = 500, and \lstinline{n_eff_particles} = 30.
 
 \begin{figure}[htp]
     \centering
     \includegraphics[width=0.4\textwidth]{actual_paper_graphs/gridsearch_particle_filter.pdf}\hfill
-    \caption{Hyperparameter tuning of the Particle filter.}
+    \caption{Hyperparameter tuning of the Particle filter. Any filters colored orange may be considered "optimal", depending on the necessary time and accuracy constraints.}
     \label{fig:particle_hyperparam}
 \end{figure}
+
+\subsubsection{Evaluation Metrics}
+We also used the average absolute angle error as our primary evaluation metric. This took the average of the absolute circular difference between the true state and predicted state at each time step across the whole dataset. We referred to this as average circular error. We also used the total time to filter a given dataset as our other evaluation metric.
+
 
 \section{Results and Analysis}
 We first examine the success of the circular Kalman Filter (Figure \ref{fig:simple_kalman}). 
 We then consider the speed and accuracy of the various filters (Figures \ref{fig:all_simulated} and \ref{fig:all_real}).
 Subsequently, we review our unsuccessful attempt at combining many simultaneous angle observations into one estimated angle (Figure \ref{fig:multiple_angles}).
-Finally, we show results of hyperparameter tuning the Particle filter (Figure \ref{fig:particle_hyperparam}).
+Finally, we show results of hyperparameter tuning the Particle filter (Figure \ref{fig:particle_hyperparam}). Note that the figures are the most illustrative of the results and performance of each filter.
 
 \begin{figure}[htp]
     \centering
@@ -237,7 +241,7 @@ Thus, all of our filters can run in real time.
 \end{figure}
 
 \subsection{Accuracy}
-We focused on the accuracy of the following situations.
+We tested the accuracy of the filters on the following synthetic and real datasets.
 \subsubsection{White Noise at Constant Angle}
 On the White Noise dataset, the Particle filter was the best filter, with about half the error of the Kalman filters. The error for the Kalman filters was almost exactly the same (.367 for Noncircular and .369 for Circular), which makes sense because the wraparound algorithm in the Circular Kalman filter was not used, making it behave exactly like the unmodified Kalman filter.
 \subsubsection{Constant Angle with Engine Noise}
