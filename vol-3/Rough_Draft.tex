@@ -33,25 +33,23 @@
 
 
 \begin{document}
-\title{Adapting Bayesian Filters for use of Angular Data}
+\title{Adapting Bayesian Filters for use with Angular Data}
 \author{Cannon Tuttle, Curtis Evans, Spencer Ashton, Tyler Sanders}
 
 %% comment out next command to put today's date after names of group members, or put a desired day in the parethesis
 \date{\today}
 
 \begin{abstract}
-    This paper attempts to adapt linear filtering methods to work with angular data in order to predict angle of arrival of human voices. The data used for this 
-    project was both simulated and real data. We used various Bayesian filtering techniques on a continuous state space model to optimize angle estimation. We had
-    success with a particle filter and a circular Kalman filter.
+We adapt Bayesian filtering methods for use with angular data. We focus on a specific acoustics application, but accurate angle estimation is crucial in several fields. Due to the wrapping property of angular data, traditional filters are unsuitable for filtering angular data. We employ a simple continuous state-space model and successfully adapt the Kalman and Particle filters to account for the nature of circular data. We test these methods on both simulated and real data, finding our filters to perform far superior to an unmodified Kalman filter.
 \vspace{-\baselineskip}
 \end{abstract}
-
+\vspace{-\baselineskip}
 \maketitle
 \vspace{-\baselineskip}
 \section{Problem Statement and Motivation}
 Imagine a construction site with heavy machinery, such as excavators, dump trucks, etc.,  in operation. The machine operator typically communicates with designated spotters via radio, but this leaves any other workers on the site unable to interface directly with the machine operators. A BYU acoustics project seeks to remedy this with a sound system that can pick up on the sound of human voice from outside the machine, filter out the noise, and reproduce the speech, including its relative direction to the machine, for the machine operator.  This will augment the safety of those outside the machinery by increasing the awareness of the machine operators.
 
-In order to replicate the directionality of the sound, the angle of arrival of the sound must be accurately estimated over time. Currently, this angle in relation to the center of the microphone array (see Figure \ref{fig:array}) is calculated using pressure measurements and triangulation. According to the researchers, a sufficiently good angle approximation for this application is within $\pm15^{\circ}$ of the true angle. However, the noisy environment makes raw triangulation insufficiently accurate. Somewhat rudimentary filtering has been implemented to improve stability, but so far the results of the calculation are still unreliable.
+In order to replicate the directionality of the sound, the angle of arrival of the sound must be accurately estimated over time. Currently, this angle in relation to the center of the microphone array (see Figure \ref{fig:array}) is calculated using pressure measurements and triangulation. Distance is also calculated, but is unimportant for this application. According to the researchers, a sufficiently good angle approximation for this application is within $\pm15^{\circ}$ of the true angle. However, the noisy environment makes raw triangulation insufficiently accurate. Somewhat rudimentary filtering has been implemented to improve stability, but so far the results of the calculation are still unreliable.
 
 \begin{figure}[htp]
 \includegraphics*[width=0.5\textwidth]{Pic of Real Mic Array.jpg}\hfill
@@ -59,19 +57,14 @@ In order to replicate the directionality of the sound, the angle of arrival of t
 \label{fig:array}
 \end{figure}
 
-Our aim is to improve the robustness of the angle estimation in order to allow the researchers to more accurately reproduce the sound directionality. Previous work has shown that an unmodified Kalman Filter does not work well on angular data\cite{Research}. Various distributions, including a wrapped normal distribution and the Von Mises distribution have been successfully implemented to be used with Kalman type filters. However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture \cite{Research}.
+Our aim is to improve the robustness of the angle estimation in order to allow the researchers to more accurately reproduce the sound directionality. Previous work has shown that an unmodified Kalman Filter does not work well on angular data\cite{Research}. Various distributions, including a wrapped normal distribution and the Von Mises distribution have been successfully implemented to be used with Kalman type filters. However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture \cite{Research}. Particle filters have shown to be useful for filtering angle data, for example in robotics\cite{Oops}.
 
 We modeled the angle of arrival evolution process as a continuous state space model and employed various Bayesian filtering techniques in order to optimize the angle estimation. This included adapting Kalman filters, normally used with data defined for all real numbers and gaussian distributed noise, to work with circular data that are defined on $[0,2\pi]$ with the wrapping property at the boundary. We also adapted a Particle filter, a type of Bayesian filter that allows for the use of an arbitrary distribution, for use with circular probability distributions.
-
-
-
 
 %% Second Section
 \section{Data}
 The data used for this project included both data given to us by the research team and simulated data. The original data is in the form of microphone pressure measurements that we then ran through a triangulation algorithm, provided to us by the research team, to produce angle measurements in time. Due to symmetry, each pair of microphones produces two possible angles. These can each be taken directly as possible measurements, producing 42 measurements per time step in our case, or all synthesized in order to produce a single angle measurement per time step. The provided triangulation algorithm produces data for both cases.
 However, the provided data didn’t include certain extreme scenarios relevant to this application, including harsh discontinuities, frequent angle wraparounds, etc. To account for these scenarios, we produced representative synthetic data by plotting a “true” angle, then adding gaussian noise to it to be used as the angle measurement. We also reserved real data to test our filter on after tuning our filter parameters.
-
-
 
 %% Third Section 
 \section{Methods}
@@ -175,15 +168,20 @@ The Particle filter is defined with the following hyperparameters:
     \item \lstinline{K1} defines the shape term of the state noise distribution.
     \item \lstinline{K2} defines the same for the measurement noise distribution.
     \item \lstinline{n_particles} defines the number of particles the model employs.
-    \item \lstinline{N_eff_particles} defines the minimum number of “effective” particles allowed before particles are resampled.
+    \item \lstinline{n_eff_particles} defines the minimum number of “effective” particles allowed before particles are resampled.
 \end{itemize}
 
-Similar to the Kalman filter, we tuned the hyperparameters \lstinline{K1},
-\lstinline{K2},\newline \lstinline{N_particles}, and \lstinline{N_eff_particles} by performing a
-gridsearch over many different possible values. A filter was constructed for each hyperparameter
-combination, with its performance tested across several different datasets. We then chose the
-hyperparameters that produced minimum average angular error over the different datasets. A similar
-method was implemented for a robotics research paper as well see \cite{Oops}.
+We tuned the aforementioned hyperparameters by performing a
+gridsearch over several different possible values. A filter was constructed for each hyperparameter
+combination, with its performance tested across multiple datasets. We then chose the
+model that produced minimum average angular error over the different datasets (see Figure \ref{fig:particle_hyperparam}). This filter had the parameters \lstinline{K1} = 3, \lstinline{K1} = 2, \lstinline{n_particles} = 250, and \lstinline{n_eff_particles} = 10.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.4\textwidth]{actual_paper_graphs/gridsearch_particle_filter.pdf}\hfill
+    \caption{Hyperparameter tuning of the Particle filter.}
+    \label{fig:particle_hyperparam}
+\end{figure}
 
 \section{Results and Analysis}
 We first examine the success of the circular Kalman Filter (Figure \ref{fig:simple_kalman}). 
@@ -191,9 +189,21 @@ We then consider the speed and accuracy of the various filters (Figures \ref{fig
 Subsequently, we review our unsuccessful attempt at combining many simultaneous angle observations into one estimated angle (Figure \ref{fig:multiple_angles}).
 Finally, we show results of hyperparameter tuning the Particle filter (Figure \ref{fig:particle_hyperparam}).
 
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=.95\textwidth]{actual_paper_graphs/all_simulated.pdf}\hfill
+    \caption{
+        Running each filter (columns) on various simulated datasets (rows).
+        The red dots represent observations of the green true angle. 
+        The observations alone are filtered to produce the blue estimate angles.
+        Each cell displays average error (E) and the total time taken, in seconds (T).
+        }
+    \label{fig:all_simulated}
+\end{figure}
+
 \subsection{Circular vs Naïve}
-As a simple demonstration, we compared the performance of the naive and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
-compared to the naive filter. The naïve filter tended toward the arithmetic mean of $180^{\circ}$ of the data, while the circular Kalman filter accurately tracked the source around the entire circle. See Figure \ref{fig:simple_kalman} below.
+As a simple demonstration, we compared the performance of the naïve and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
+compared to the naïve filter. The naïve filter tended toward the arithmetic mean of $180^{\circ}$ of the data, while the circular Kalman filter accurately tracked the source around the entire circle. See Figure \ref{fig:simple_kalman} below.
 
 \begin{figure}[htp]
     \centering
@@ -215,35 +225,9 @@ With this data, the filters all failed to accurately track the data in any of th
     \label{fig:multiple_angles}
 \end{figure}
 
-
-
-\subsection{Hyperparameter tuning of Most Accurate Filter}
-The particle filter has several model parameters as mentioned previously. We performed a grid search
-to find the best filter for the engine dataset, see Figure \ref{fig:particle_hyperparam}.
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=0.4\textwidth]{actual_paper_graphs/gridsearch_particle_filter.pdf}\hfill
-    \caption{Hyperparameter tuning of the Particle filter.}
-    \label{fig:particle_hyperparam}
-\end{figure}
-
-
 \subsection{Speed}
 The Kalman filters ran in about 3-5ms on 1 second of data, while the Particle filter took about 125ms, in total about $30$ times longer than the Kalman filters.
 Thus, all of our filters can run in real time. 
-
-
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=.95\textwidth]{actual_paper_graphs/all_simulated.pdf}\hfill
-    \caption{
-        Running each filter (columns) on various simulated datasets (rows).
-        The red dots represent observations of the green true angle. 
-        The observations alone are filtered to produce the blue estimate angles.
-        Each cell displays average error (E) and the total time taken, in seconds (T).
-        }
-    \label{fig:all_simulated}
-\end{figure}
 
 \begin{figure}[htp]
     \centering
@@ -277,8 +261,8 @@ it should be emphasized that operators should still use sight and radio communic
 \section{Conclusion}
 Our goal was to improve robustness of the angle estimation by adapting filtering methods for use with circular data. We derived a very simple modification to the Kalman filter that 
 allows it to work for circular data, and we implemented a particle filter using circular probability distributions. We found the particle filter and the circular Kalman filter suitable 
-for angular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient but suffers in 
-accuracy in cases of strong nonlinearity. Due to the wraparound property of angular data, the unmodified Kalman filter is unsuitable for angular data.
+for angular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient has its 
+accuracy suffer in cases of strong nonlinearity. Due to the wraparound property of angular data, the naïve Kalman filter is unsuitable for angular data.
 
 For the BYU Acoustics project specifically, if the computational cost of the filtering step is a concern, we would recommend use of the circular Kalman filter for this project due to its low 
 cost and accurate performance except in cases of strong nonlinearity. If more computational headroom is allowed, the particle filter would be ideal, as it performed well even in cases of 
