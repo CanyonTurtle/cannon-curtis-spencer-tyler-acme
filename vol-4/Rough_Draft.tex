@@ -127,15 +127,23 @@ state space guess. We ran model with varying $t_f$ guesses and got varying resul
     \label{fig:free_time_no_sun}
 \end{figure}
 
-We needed to add the sun, but the problem became unstable due the massive size of the sun (See Figure \ref{fixed_time_sun}). One suggestion we had was to work in logspace and we also changed how 
+We needed to add the sun, but the problem became unstable due the massive size of the sun (See Figure \ref{fig:fixed_time_sun_bad}). One suggestion we had was to work in logspace and we also changed how 
 we were computing the norm in the denominator. We were using a simple function that was computing the norm from the formula, but instead we started using \lstinline{scipy.linalg.norm}. These two changes 
-solved the instability problem.
+solved the instability problem. This difference can be seen in Figure \ref{fig:fixed_time_sun_good}. One thing to notice in Figure \ref{fig:fixed_time_no_sun} and Figure \ref{fig:fixed_time_sun_good} is that the
+optimal control completely changes. We believe that the control with the sun is more realistic and a control that the Guild Naviators would accept.
 
 \begin{figure}[htp]
     \centering
     \includegraphics[width=0.8\textwidth]{instability_sun.png}\hfill
     \caption{Instability with the sun}
-    \label{fig:fixed_time_sun}
+    \label{fig:fixed_time_sun_bad}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{f3.png}\hfill
+    \caption{Stability with the sun}
+    \label{fig:fixed_time_sun_good}
 \end{figure}
 
 
