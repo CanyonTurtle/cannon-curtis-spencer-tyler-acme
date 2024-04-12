@@ -163,15 +163,7 @@ As the particle filter keeps track of a large number of possible states around t
 location in the state space. Unfortunately, the particle filter performs a similar number of computations for each individual particle as the Kalman filter performs in total. As we are using \lstinline{n_particles}, our particle filter takes \lstinline{n_particles} 
 times as long to compute each step.
 
-The Particle filter is defined with the following hyperparameters: 
-\begin{itemize}
-    \item \lstinline{K1} defines the shape term of the state noise distribution.
-    \item \lstinline{K2} defines the same for the measurement noise distribution.
-    \item \lstinline{n_particles} defines the number of particles the model employs.
-    \item \lstinline{n_eff_particles} defines the minimum number of “effective” particles allowed before particles are resampled.
-\end{itemize}
-
-We tuned the aforementioned hyperparameters by performing a
+The Particle filter is defined with the following hyperparameters: \lstinline{K1} defines the shape term of the state noise distribution,  \lstinline{K2} defines the same for the measurement noise distribution, \lstinline{n_particles} defines the number of particles the model employs, and \lstinline{n_eff_particles} defines the minimum number of “effective” particles allowed before particles are resampled. We tuned the hyperparameters by performing a
 gridsearch over several different possible values using the metrics discussed below. A filter was constructed for each hyperparameter
 combination, with its performance tested across multiple datasets. We then chose the
 model that produced minimum average circular error over the different datasets (see Figure \ref{fig:particle_hyperparam}). This filter had the parameters \lstinline{K1} = 3, \lstinline{K2} = 5, \lstinline{n_particles} = 500, and \lstinline{n_eff_particles} = 30.
@@ -186,12 +178,23 @@ model that produced minimum average circular error over the different datasets (
 \subsection{Evaluation Metrics}
 We also used the average absolute angle error as our primary evaluation metric. This took the average of the absolute circular difference between the true state and predicted state at each time step across the whole dataset. We referred to this as average circular error. We also used the total time to filter a given dataset as our other evaluation metric.
 
-
 \section{Results and Analysis}
 We first examine the success of the circular Kalman Filter (Figure \ref{fig:simple_kalman}). 
 We then consider the speed and accuracy of the various filters (Figures \ref{fig:all_simulated} and \ref{fig:all_real}).
 Subsequently, we review our unsuccessful attempt at combining many simultaneous angle observations into one estimated angle (Figure \ref{fig:multiple_angles}).
 Finally, we show results of hyperparameter tuning the Particle filter (Figure \ref{fig:particle_hyperparam}). Note that the figures are the most illustrative of the results and performance of each filter.
+
+\subsection{Circular vs Naïve}
+As a simple demonstration, we compared the performance of the naïve and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
+compared to the naïve filter. The naïve filter tended toward the arithmetic mean of $180^{\circ}$ of the data, while the circular Kalman filter accurately tracked the source around the entire circle. See Figure \ref{fig:simple_kalman} below.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.47\textwidth]{actual_paper_graphs/non_altered_kalman.pdf}\hfill
+    \includegraphics[width=0.47\textwidth]{actual_paper_graphs/altered_kalman.pdf}\hfill
+    \caption{The naïve and circular Kalman Filter}
+    \label{fig:simple_kalman}
+\end{figure}
 
 \begin{figure}[htp]
     \centering
@@ -205,22 +208,11 @@ Finally, we show results of hyperparameter tuning the Particle filter (Figure \r
     \label{fig:all_simulated}
 \end{figure}
 
-\subsection{Circular vs Naïve}
-As a simple demonstration, we compared the performance of the naïve and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
-compared to the naïve filter. The naïve filter tended toward the arithmetic mean of $180^{\circ}$ of the data, while the circular Kalman filter accurately tracked the source around the entire circle. See Figure \ref{fig:simple_kalman} below.
-
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=0.47\textwidth]{actual_paper_graphs/non_altered_kalman.pdf}\hfill
-    \includegraphics[width=0.47\textwidth]{actual_paper_graphs/altered_kalman.pdf}\hfill
-    \caption{The naïve and circular Kalman Filter}
-    \label{fig:simple_kalman}
-\end{figure}
 \subsection{Filtering Multiple Angle Estimates}
 
 As discussed in Data, each microphone pair technically calculates two possible measured angles, which are normally synthesized by the provided triangulation algorithm to find the most likely angle. Since the observation matrix $H$ allows for an arbitrary number of measurements, we attempted filtering using all 42 angle measurements directly in our filters.  
 See Figure \ref{fig:multiple_angles}. 
-With this data, the filters all failed to accurately track the data in any of the measured datasets. We believe this is because the array is not symmetric with respect to the angle of arrival of the sound, leading to angle measurements that are not distributed normally around the true angle. However, if the microphone array were to be circular, this method may be viable. Thus, in all other cases we treated the one angle returned by the triangulation algorithm as the measurement angle.
+With this data, the Kalman filters failed to accurately track the data in any of the measured datasets. We believe this is because the array is not symmetric with respect to the angle of arrival of the sound, leading to angle measurements that are not distributed normally around the true angle. However, if the microphone array were to be circular, this method may be viable. In all other cases we treated the one angle returned by the triangulation algorithm as the measurement angle. The Particle filter successfully tracked the real angle in this case, and even ignored certain abberations that were returned by the single measurement operation. However, incorporating this number of measurements caused the specified particle filter to take ~$\frac{1}{3}$ as long as the total length of the data, possibly reaching filter times unsuitable for real time filtering.
 
 \begin{figure}[htp]
     \centering
@@ -241,19 +233,13 @@ Thus, all of our filters can run in real time.
 \end{figure}
 
 \subsection{Accuracy}
-We tested the accuracy of the filters on the following synthetic and real datasets.
-\subsubsection{White Noise at Constant Angle}
-On the White Noise dataset, the Particle filter was the best filter, with about half the error of the Kalman filters. The error for the Kalman filters was almost exactly the same (.367 for Noncircular and .369 for Circular), which makes sense because the wraparound algorithm in the Circular Kalman filter was not used, making it behave exactly like the unmodified Kalman filter.
-\subsubsection{Constant Angle with Engine Noise}
-The Particle filter performed the best again on this data set, however the improvement over the Kalman filters was not as large as it was with the White Noise data set. The error of the Particle filter was $\approx 25\%$ lower than the unmodified Kalman filter and was $\approx 40\%$ lower than the Circular Kalman filter. It is interesting to note that the unmodified Kalman filter performed significantly better than the Circular Kalman filter on this data set.
+We tested the accuracy of the filters on the following synthetic and real datasets. See Figures \ref{fig:all_simulated} and \ref{fig:all_real} for quantitative results, as well as the discussion below.
+\subsubsection{Wraparound}
+This is a synthetic dataset that represents a source moving in a circle at a constant angular velocity to test a simple case involving wraparound. This was also the data used in \ref{fig:simple_kalman}. As discussed above, the Naïve Kalman filter failed to track the angle, while the Circular Kalman filter successfully navigated the wraparound point. The particle filter also tracked the angle,
 \subsubsection{Switching}
 This is an artificial dataset created to simulate jumping between angles across $0^{\circ}$. The Naïve Kalman filter performed poorly on this dataset. The Circular Kalman and Particle filters performed much better, with the Particle filter being twice as accurate ($\mathrm{E}=0.199$ vs $\mathrm{E}=.392$) as the Circular Kalman filter.
 \subsubsection{With Jump}
 The Naïve Kalman filter performs better on this data set vs the Switching data set, but the results of the other two filters are the same.
-\subsubsection{Wraparound}
-The results of this dataset are the same as the previous dataset.
-\subsubsection{The Best Filter}
-The Circular Kalman and Particle filters both demonstrated significantly improved performance on circular data compared to the naïve Kalman filter. The Particle filter was around twice as accurate across datasets as the Circular Kalman filter, but took about 30 times longer to run. Specifically, the Particle filter performed better in cases of strongly nonlinear behavior. If enough computing headroom is available, the Particle filter is a suitable choice for this application, but the Circular Kalman filter also performed well with very few computations. Only the Particle filter was consistently within the desired $15^{\circ}$ of accuracy on all datasets.
 
 \section{Ethical Considerations}
 This project seeks to augment the safety of those outside the machinery by increasing the awareness of the machine operators. However, before deployment, this model must be 
@@ -265,8 +251,8 @@ it should be emphasized that operators should still use sight and radio communic
 \section{Conclusion}
 Our goal was to improve robustness of the angle estimation by adapting filtering methods for use with circular data. We derived a very simple modification to the Kalman filter that 
 allows it to work for circular data, and we implemented a particle filter using circular probability distributions. We found the particle filter and the circular Kalman filter suitable 
-for circular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient has its 
-accuracy suffer in cases of strong nonlinearity. Due to the wraparound property of circular data, the naïve Kalman filter is unsuitable for circular data.
+for circular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient buy has its 
+accuracy suffer in cases of strong nonlinearity. The Particle filter was around twice as accurate across all datasets as the Circular Kalman filter, but took about 30 times longer to run. If enough computing headroom is available, the Particle filter is a suitable choice for this application, but the Circular Kalman filter also performed well with very few computations. Only the Particle filter was consistently within the desired $15^{\circ}$ of accuracy on all datasets. Due to the wraparound property of circular data, the naïve Kalman filter is unsuitable for circular data.
 
 For the BYU Acoustics project specifically, if the computational cost of the filtering step is a concern, we would recommend use of the circular Kalman filter for this project due to its low 
 cost and accurate performance except in cases of strong nonlinearity. If more computational headroom is allowed, the particle filter would be ideal, as it performed well even in cases of 
