@@ -57,7 +57,7 @@ In order to replicate the directionality of the sound, the angle of arrival of t
 \label{fig:array}
 \end{figure}
 
-Our aim is to improve the robustness of the angle estimation in order to allow the researchers to more accurately reproduce the sound directionality. Previous work has shown that an unmodified Kalman Filter does not work well on circular data \cite{Research}. Various distributions, including a wrapped normal distribution and the Von Mises distribution have been successfully implemented to be used with Kalman type filters. However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture \cite{Research}. Particle filters have shown to be useful for filtering angle data, for example in robotics \cite{Oops}.
+Our aim is to improve the robustness of the angle estimation in order to allow the researchers to more accurately reproduce the sound directionality. Previous work has shown that an unmodified Kalman Filter does not work well on circular data \cite{Research}. Various cicrular distributions, including a wrapped normal distribution and the Von Mises distribution have been successfully implemented to be used with Kalman type filters. However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture \cite{Research}. Particle filters have shown to be useful for filtering angle data, for example in robotics \cite{Oops}.
 
 We modeled the angle of arrival evolution process as a continuous state space model and employed various Bayesian filtering techniques in order to optimize the angle estimation. This included adapting Kalman filters, normally used with data defined for all real numbers and gaussian distributed noise, to work with circular data that are defined on $[0,2\pi]$ with the wrapping property at the boundary. We also adapted a Particle filter, a type of Bayesian filter that allows for the use of an arbitrary distribution, for use with circular probability distributions.
 
@@ -71,7 +71,7 @@ However, the provided data didn’t include certain extreme scenarios relevant t
 We utilized several methods to compute the hidden angle measurement. Throughout this paper we use degrees in plots and examples, but all the measurements and computations were done in radians. 
 
 \subsection{State Space Model}
-In order to represent the angle evolution over time, we used a state space model that included current angle, previous angle, and angular velocity. In this case, the speaker will either be stationary or moving near a constant velocity, so we did not include an acceleration term. Angular velocity was approximated as $\theta'_t \approx \frac{\theta_{t} - \theta_{t-1}}{\Delta t}$ and $\theta_t$ was approximated using the forward Euler step $\theta_t \approx \Delta t\theta’_{t}$. This yields the following:
+In order to represent the angle evolution over time, we used a state space model that included current angle, previous angle, and angular velocity. In this case, the speaker will either be stationary or moving with near constant velocity, so we did not include an acceleration term. Angular velocity was approximated as $\theta'_t \approx \frac{\theta_{t} - \theta_{t-1}}{\Delta t}$ and $\theta_t$ was approximated using the forward Euler step $\theta_t \approx \Delta t\theta’_{t}$. This yields the following:
 
 \[\mathbf{x}_t = \begin{pmatrix*}[l]
     \theta_t \\
@@ -118,7 +118,7 @@ We first implemented a naïve Kalman filter using the efficient Kalman Gain form
 
 
 \subsubsection{Circular Kalman Filter}
-We adapted the Kalman filter for circualr data by changing the aforementioned update step to account for circular arithmetic. Specifically, we changed the calculation of the difference between true and expected observations to ensure that the difference calculated was never greater than $180^{\circ}$ (i.e. measuring the distance between angles on a circle), while preserving sign to account for their relative position. This computes the circular difference illustrated in the table. The new update step is illustrated in Algorithm \ref{alg:kalman}.
+We adapted the Kalman filter for circualr data by changing the aforementioned update step to account for circular arithmetic. Specifically, we changed the calculation of the difference between true and expected observations to ensure that the difference calculated was never greater than $180^{\circ}$ (i.e. measuring the distance between angles on a circle), while preserving sign to account for their relative position. This computes the circular difference shown in the table. The new update step is illustrated in Algorithm \ref{alg:kalman}.
 
 
 \begin{algorithm}
@@ -139,9 +139,9 @@ We adapted the Kalman filter for circualr data by changing the aforementioned up
 \subsection{Particle Filter}
 The second method we employed was another type of Bayesian filter, the particle filter \cite{Particle}. The particle filter employs a large number of possible current states, each referred to 
 as a “particle”. Each particle has an associated weight, interpreted as the probability that the particle accurately reflects the hidden state. All weights sum to 1 to form a probability distribution. As the source can possibly 
-come in at any angle, we initialize the particles with uniformly distributed states and weights. At each time step, the filter propagates all of the particles forward in time according to the state space 
+appear at any initial angle, we initialize the particles with uniformly distributed states and weights. At each time step, the filter stochastically propagates all of the particles forward in time according to the state space 
 model, including adding state noise in the update step. Then, using the data, it updates the weights of each particle by computing the posterior probabilities given data. Finally, it computes the state estimate 
-as the weighted average of the states of all the particles. 
+as the weighted circular average of the states of all particles, computed using \lstinline{circmean} from \lstinline{astropy}. 
 
 In the update step, the filter computes $P(\theta|\text{data}) \propto P(\text{data}|\theta)P(\theta)$ for each particle. The prior $P(\theta)$ is given by the particle’s previous weight, while $P(\text{data}|\theta)$ is calculated 
 according to the probability distribution defined for the measurement noise. One of the benefits of the particle filter is that, unlike the normal distribution requirement of the Kalman filter, any arbitrary noise 
@@ -178,7 +178,7 @@ model that produced minimum average circular error over the different datasets (
 \end{figure}
 
 \subsection{Evaluation Metrics}
-We also used the average absolute angle error as our primary evaluation metric. This took the average of the absolute circular difference between the true state and predicted state at each time step across the whole dataset. We referred to this as average circular error, \lstinline{E}. We also used the total time to filter a given dataset as our other evaluation metric. We refer to this as filter time, \lstinline{T}.
+We used the average absolute angle error as our primary evaluation metric. This took the average of the absolute circular difference between the true state and predicted state at each time step across the whole dataset. We referred to this as average circular error, \lstinline{E}. We also used the total time to filter a given dataset as our other evaluation metric. We refer to this as filter time, \lstinline{T}.
 
 \section{Results and Analysis}
 We examine the success of the circular Kalman Filter (Figure \ref{fig:simple_kalman}), 
@@ -201,7 +201,7 @@ compared to the naïve filter. The naïve filter tended toward the arithmetic me
 
 \subsection{Filtering Multiple Angle Estimates}
 
-As discussed in Data, each microphone pair technically calculates two possible measured angles, which are normally synthesized by the provided triangulation algorithm to find the most likely angle. Since the observation matrix $H$ allows for an arbitrary number of measurements, we attempted filtering using all 42 angle measurements directly in our filters.  
+As discussed in Data, each microphone pair technically calculates two possible measured angles, which are normally synthesized by the provided triangulation algorithm to return the measured angle. Since the observation matrix $H$ allows for an arbitrary number of measurements, we attempted filtering using all 42 angle measurements directly in our filters.  
 See Figure \ref{fig:multiple_angles}. 
 With this data, the Kalman filters failed to accurately track the data in any of the measured datasets. We believe this is because the array is not symmetric with respect to the angle of arrival of the sound, leading to angle measurements that are not distributed normally around the true angle. However, if the microphone array were to be circular, this method may be viable. In all other cases we treated the one angle returned by the triangulation algorithm as the measurement angle. The Particle filter successfully tracked the real angle in this case, and even ignored certain abberations that were returned by the single measurement operation. However, incorporating this number of measurements caused the specified particle filter to take ~$\frac{1}{3}$ as long as the total length of the data, possibly reaching filter times unsuitable for real time filtering.
 
