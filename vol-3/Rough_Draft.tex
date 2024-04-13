@@ -234,7 +234,7 @@ This is a synthetic dataset that represents a source moving in a circle at a con
 \subsubsection{With Jump}
 This is a synthetic dataset that represents a source moving back and forth then switching trajectory midway in order to account for a simple nonlinearity. Since there was no wraparound to consider, the Naïve and Circular Kalman filters both had equivalent performance, both accurately tracking the angle. The Particle filter tracked the angle about twice as accurately as the Kalman filters.
 \subsubsection{Switching}
-This is a synthetic dataset that represents to simulate the nonlinearity of jumping between angles across $0^{\circ}$. The Naïve Kalman filter performed poorly on this dataset. The Circular Kalman and Particle filters performed much better, with the Particle filter being about twice as accurate as the Circular Kalman filter.
+This is a synthetic dataset that represents the nonlinearity of jumping between angles across $0^{\circ}$. The Naïve Kalman filter performed poorly on this dataset. The Circular Kalman and Particle filters performed much better, with the Particle filter being about twice as accurate as the Circular Kalman filter.
 \begin{figure}[htp]
     \centering
     \includegraphics[width=.75\textwidth]{actual_paper_graphs/all_real.pdf}\hfill
@@ -247,11 +247,9 @@ This dataset is a recording of a source producing pink noise, a type of filtered
 This dataset is a recording of a source producing pink noise, a type of filtered gaussian noise, while moving around the microphone array. All three filters accurately tracked the source in this dataset, with the particle filter performing slightly more accurately.
 
 \section{Ethical Considerations}
-This project seeks to augment the safety of those outside the machinery by increasing the awareness of the machine operators. However, before deployment, this model must be 
-shown to improve safety as much as or more than it increased the safety perception of the operators. Risk compensation “is a theory which suggests that people typically adjust 
-their behavior in response to perceived levels of risk, becoming more careful where they sense greater risk and less careful if they feel more protected” \cite{Risk}. This should 
-be accounted for before deploying these methods in the field to ensure that the model performs robustly enough to truly enhance overall safety, despite risk compensation. Furthermore, 
-it should be emphasized that operators should still use sight and radio communication to identify nearby individuals, and that people near machinery must still exercise caution. 
+Although there are no data privacy concerns, we must consider the safety of operators using direction-filtered cabin audio in heavy machinery. Before deployment, this model must be 
+shown to be a net positive to safety, despite operator risk compensation (acting less carefully because of perceived safety features \cite{Risk}). Even then,
+operators should still use sight and radio communication to identify nearby individuals, and people near machinery must still exercise caution. 
 
 \section{Conclusion}
 Our goal was to improve robustness of the angle estimation by adapting filtering methods for use with circular data. We derived a very simple modification to the Kalman filter that 
