@@ -57,7 +57,7 @@ In order to replicate the directionality of the sound, the angle of arrival of t
 \label{fig:array}
 \end{figure}
 
-Our aim is to improve the robustness of the angle estimation in order to allow the researchers to more accurately reproduce the sound directionality. Previous work has shown that an unmodified Kalman Filter does not work well on circular data\cite{Research}. Various distributions, including a wrapped normal distribution and the Von Mises distribution have been successfully implemented to be used with Kalman type filters. However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture \cite{Research}. Particle filters have shown to be useful for filtering angle data, for example in robotics\cite{Oops}.
+Our aim is to improve the robustness of the angle estimation in order to allow the researchers to more accurately reproduce the sound directionality. Previous work has shown that an unmodified Kalman Filter does not work well on circular data \cite{Research}. Various distributions, including a wrapped normal distribution and the Von Mises distribution have been successfully implemented to be used with Kalman type filters. However, these adaptations are complex and not easily implemented, as they include approximating the distributions with a wrapped Dirac mixture \cite{Research}. Particle filters have shown to be useful for filtering angle data, for example in robotics \cite{Oops}.
 
 We modeled the angle of arrival evolution process as a continuous state space model and employed various Bayesian filtering techniques in order to optimize the angle estimation. This included adapting Kalman filters, normally used with data defined for all real numbers and gaussian distributed noise, to work with circular data that are defined on $[0,2\pi]$ with the wrapping property at the boundary. We also adapted a Particle filter, a type of Bayesian filter that allows for the use of an arbitrary distribution, for use with circular probability distributions.
 
@@ -72,6 +72,7 @@ We utilized several methods to compute the hidden angle measurement. Throughout 
 
 \subsection{State Space Model}
 In order to represent the angle evolution over time, we used a state space model that included current angle, previous angle, and angular velocity. In this case, the speaker will either be stationary or moving near a constant velocity, so we did not include an acceleration term. Angular velocity was approximated as $\theta'_t \approx \frac{\theta_{t} - \theta_{t-1}}{\Delta t}$ and $\theta_t$ was approximated using the forward Euler step $\theta_t \approx \Delta t\theta’_{t}$. This yields the following:
+
 \[\mathbf{x}_t = \begin{pmatrix*}[l]
     \theta_t \\
     \theta_{t-1} \\
@@ -94,7 +95,7 @@ H = \begin{pmatrix*}[l]
 All of our filters used the same state evolution equations.
 
 \subsection{Kalman Filter}
-We implemented two Kalman Filter\cite{V3}\cite{V3 Lab Manual} approaches. We term the Kalman filter illustrated in the textbooks the naïve Kalman filter and the our altered version the circular Kalman filter.
+We implemented two Kalman Filter \cite{V3}\cite{V3 Lab Manual} approaches. We term the Kalman filter illustrated in the textbooks the naïve Kalman filter and the our altered version the circular Kalman filter.
 
 \subsubsection{Naïve Kalman Filter}
 We first implemented a naïve Kalman filter using the efficient Kalman Gain form. In the update step, the state estimation is updated as follows, where $K_t$ is Kalman Gain: \[\mathbf{\hat{x}}_t = \mathbf{\hat{x}}_{t|t-1} + K_t(\mathbf{z}_t - H\mathbf{\hat{x}}_{t|t-1}).\] The quantity $\mathbf{z}_t - H\mathbf{\hat{x}}_{t|t-1}$ is the difference between the observation, $\mathbf{z}_t$, and expected observation given the predicted state, $H\mathbf{\hat{x}}_{t|t-1}$. The naïve Kalman filter computes this as an arithmetic difference, however, it would be more accurate to compute a circular difference, as no two angles are more than $180^{\circ}$ apart. This is illustraded by the examples in the table below:
@@ -254,7 +255,7 @@ operators should still use sight and radio communication to identify nearby indi
 \section{Conclusion}
 Our goal was to improve robustness of the angle estimation by adapting filtering methods for use with circular data. We derived a very simple modification to the Kalman filter that 
 allows it to work for circular data, and we implemented a particle filter using circular probability distributions. We found the particle filter and the circular Kalman filter suitable 
-for circular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient buy has its 
+for circular data. The particle filter handles nonlinearities well but comes at a computational cost, while the circular Kalman filter is computationally efficient but has its 
 accuracy suffer in cases of strong nonlinearity. The Particle filter was around twice as accurate across all datasets as the Circular Kalman filter, but took about 30 times longer to run. If enough computing headroom is available, the Particle filter is a suitable choice for this application, but the Circular Kalman filter also performed well with very few computations. Only the Particle filter was consistently within the desired $15^{\circ}$ of accuracy on all datasets. Due to the wraparound property of circular data, the naïve Kalman filter is unsuitable for circular data.
 
 For the BYU Acoustics project specifically, if the computational cost of the filtering step is a concern, we would recommend use of the circular Kalman filter for this project due to its low 
