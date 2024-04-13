@@ -178,18 +178,13 @@ model that produced minimum average circular error over the different datasets (
 \end{figure}
 
 \subsection{Evaluation Metrics}
-We used the average absolute angle error as our primary evaluation metric. This took the average of the absolute circular difference between the true state and predicted state at each time step across the whole dataset. We referred to this as average circular error, \lstinline{E}. We also used the total time to filter a given dataset as our other evaluation metric. We refer to this as filter time, \lstinline{T}.
+We used the average absolute angle error (\lstinline{E}) as our primary evaluation metric. This took the average of the absolute circular difference between the true state and predicted state at each time step across the whole dataset. We also used the total time to filter a given dataset as our other evaluation metric. We refer to this as filter time, \lstinline{T}.
 
 \section{Results and Analysis}
 We examine the success of the circular Kalman Filter (Figure \ref{fig:simple_kalman}), 
 review filtering several simultaneous angle observations(Figure \ref{fig:multiple_angles})
 , then consider the speed and accuracy of the various filters (Figures \ref{fig:all_simulated} and \ref{fig:all_real}).
 Note, the figures best illustrate the results and performance of each filter.
-
-\subsection{Circular vs Naïve}
-As a simple demonstration, we compared the performance of the naïve and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
-compared to the naïve filter. The naïve filter tended toward the arithmetic mean of $180^{\circ}$ of the data, while the circular Kalman filter accurately tracked the source around the entire circle. See Figure \ref{fig:simple_kalman} below.
-
 
 \begin{figure}[htp]
     \centering
@@ -198,6 +193,13 @@ compared to the naïve filter. The naïve filter tended toward the arithmetic me
     \caption{Naïve vs Circular Kalman Filter performance}
     \label{fig:simple_kalman}
 \end{figure}
+
+\subsection{Circular vs Naïve}
+As a simple demonstration, we compared the performance of the naïve and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
+compared to the naïve filter. The naïve filter tended toward the arithmetic mean of $180^{\circ}$ of the data, while the circular Kalman filter accurately tracked the source around the entire circle. See Figure \ref{fig:simple_kalman} below.
+
+
+
 
 \subsection{Filtering Multiple Angle Estimates}
 
