@@ -95,7 +95,7 @@ H = \begin{pmatrix*}[l]
 All of our filters used the same state evolution equations.
 
 \subsection{Kalman Filter}
-We implemented two Kalman Filter \cite{V3}\cite{V3 Lab Manual} approaches. We term the Kalman filter illustrated in the textbooks the naïve Kalman filter and the our altered version the circular Kalman filter.
+We implemented two Kalman Filter \cite{V3}\cite{V3 Lab Manual} approaches. We term the Kalman filter illustrated in the textbooks the naïve Kalman filter and our altered version the circular Kalman filter.
 
 \subsubsection{Naïve Kalman Filter}
 We first implemented a naïve Kalman filter using the efficient Kalman Gain form. In the update step, the state estimation is updated as follows, where $K_t$ is Kalman Gain: \[\mathbf{\hat{x}}_t = \mathbf{\hat{x}}_{t|t-1} + K_t(\mathbf{z}_t - H\mathbf{\hat{x}}_{t|t-1}).\] The quantity $\mathbf{z}_t - H\mathbf{\hat{x}}_{t|t-1}$ is the difference between the observation, $\mathbf{z}_t$, and expected observation given the predicted state, $H\mathbf{\hat{x}}_{t|t-1}$. The naïve Kalman filter computes this as an arithmetic difference, however, it would be more accurate to compute a circular difference, as no two angles are more than $180^{\circ}$ apart. This is illustraded by the examples in the table below:
