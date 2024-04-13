@@ -138,9 +138,9 @@ We adapted the Kalman filter for circualr data by changing the aforementioned up
 
 \subsection{Particle Filter}
 The second method we employed was another type of Bayesian filter, the particle filter \cite{Particle}. The particle filter employs a large number of possible current states, each referred to 
-as a “particle”. Each particle has an associated weight, interpreted as the probability that the particle accurately reflects the hidden state. All weights sum to 1 to form a probability distribution. As the source can possibly 
-appear at any initial angle, we initialize the particles with uniformly distributed states and weights. At each time step, the filter stochastically propagates all of the particles forward in time according to the state space 
-model, including adding state noise in the update step. Then, using the data, it updates the weights of each particle by computing the posterior probabilities given data. Finally, it computes the state estimate 
+as a “particle”. Each particle has an associated weight, interpreted as the probability that the particle accurately reflects the hidden state. All weights sum to 1 to form a probability distribution. The source can possibly 
+appear at any initial angle, so we initialize the particle states and weights uniformly. At each time step, the filter stochastically propagates the particles forward in time according to the state space 
+model, including noise. Then, using the data, it updates the weights of each particle by computing the posterior probabilities given data. Finally, it computes the state estimate 
 as the weighted circular average of the states of all particles, computed using \lstinline{circmean} from \lstinline{astropy}. 
 
 In the update step, the filter computes $P(\theta|\text{data}) \propto P(\text{data}|\theta)P(\theta)$ for each particle. The prior $P(\theta)$ is given by the particle’s previous weight, while $P(\text{data}|\theta)$ is calculated 
@@ -186,6 +186,12 @@ review filtering several simultaneous angle observations(Figure \ref{fig:multipl
 , then consider the speed and accuracy of the various filters (Figures \ref{fig:all_simulated} and \ref{fig:all_real}).
 Note, the figures best illustrate the results and performance of each filter.
 
+
+
+\subsection{Circular vs Naïve}
+As a simple demonstration, we compared the performance of the naïve and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
+compared to the naïve filter. The naïve filter tended toward the arithmetic mean of $180^{\circ}$ of the data, while the circular Kalman filter accurately tracked the source around the entire circle. See Figure \ref{fig:simple_kalman} below.
+
 \begin{figure}[htp]
     \centering
     \includegraphics[width=0.45\textwidth]{actual_paper_graphs/non_altered_kalman.pdf}\hfill
@@ -193,12 +199,6 @@ Note, the figures best illustrate the results and performance of each filter.
     \caption{Naïve vs Circular Kalman Filter performance}
     \label{fig:simple_kalman}
 \end{figure}
-
-\subsection{Circular vs Naïve}
-As a simple demonstration, we compared the performance of the naïve and circular Kalman filters in tracking a source moving continuously in a circle. The circular Kalman filter modification resulted in a marked improvement in behavior across the boundary between $360^{\circ}$ and $0^{\circ}$ as 
-compared to the naïve filter. The naïve filter tended toward the arithmetic mean of $180^{\circ}$ of the data, while the circular Kalman filter accurately tracked the source around the entire circle. See Figure \ref{fig:simple_kalman} below.
-
-
 
 
 \subsection{Filtering Multiple Angle Estimates}
