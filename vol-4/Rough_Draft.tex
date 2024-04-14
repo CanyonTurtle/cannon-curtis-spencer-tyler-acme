@@ -33,7 +33,7 @@
 
 \begin{document}
 \title{Helping the Spacing Guild Navigate to Arrakis}
-\author{Cannon Tuttle, Curtis Evans, Spencer Ashton, Tyler Sanders}
+\author{Spencer Ashton, Curtis Evans, Cannon Tuttle, Tyler Sanders}
 
 %% comment out next command to put today's date after names of group members, or put a desired day in the parethesis
 \date{\today}
@@ -47,14 +47,14 @@
 \maketitle
 
 %% First Section
-\section{Problem Statement and Motivation}
+\section{Background}
 The \textbf{Dune} Guild Naviators are tasked with delivering House Atreides from the planet Caladan to Arrakis. Usually they solve the optimal control in their mind while taking spice, but since spice production
 has been disrupted they've instead decided to turn to ACME students on Earth to solve the optimal control for them. They have asked the ACME students to find the best path while minimizing fuel consumption. 
 
 
-\section{State Equations}
+\section{Mathematical Representation}
 We used Newton's second law of motion $F=ma$ to arrive at our state equations where $m_p$ is the mass of the planet, $\mathbf{x}_s$ is the $x$ and $y$ position of the space ship, and $\mathbf{x}_p$ is the $x$
-and $y$ position of the planet, and $\mathbf{u}$ is the acceleration in the $x$ and $y$ direction for the spaceship. \textcolor{red}{TODO} talk about what $G$ is and how this equation makes sense.
+and $y$ position of the planet, and $\mathbf{u}$ is the acceleration in the $x$ and $y$ direction for the spaceship. We will have a set of planets $P = \{p_1, p_2,\dots,p_n\}$. \textcolor{red}{TODO} talk about what $G$ is and how this equation makes sense.
 \[\ddot{\mathbf{x}} = -G\sum_{p\in{P}}^{}\frac{m_p}{||\mathbf{x}_s-\mathbf{x}_p||_2^3}(\mathbf{x}_s-\mathbf{x}_p) + \mathbf{u}\]
 Converting $\ddot{\mathbf{x}}$ into a first order differential equation we get the following state equation. 
 \[\begin{pmatrix}
@@ -74,30 +74,47 @@ We decided to minimize the control used to get the optimal fuel usage. That give
 \[\mathbf{x}_s(0) = \text{Caladan's Position},\: \dot{\mathbf{x}}_s(0) = \text{Caladan's Velocity}\]
 \[\mathbf{x}_s(t_f) = \text{Arrakis' Position},\: \dot{\mathbf{x}}_s(t_f) = \text{Arrakis' Velocity}\]
 
+\section{Solution}
 We are now ready to use Pontryagin's maximum principle with 
 \[H = \mathbf{p}\cdot\mathbf{f(\mathbf{x})} - L\]
 Applying this to our state equation and Lagrangian we get the following Hamiltonian.
-\[H = p_1\dot{x}_s + p_2\dot{y}_s + p_3(-G\sum_{p\in{P}}^{}\frac{m_p(x_s - x_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_x)\]
-\[+ p_4(-G\sum_{p\in{P}}^{}\frac{m_p(y_s - y_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_y) - u_x^2 - u_y^2\]
+\[H = p_1\dot{x}_s + p_2\dot{y}_s + p_3\left[-G\sum_{p\in{P}}^{}\frac{m_p(x_s - x_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_x\right]\]
+\[+ p_4\left[-G\sum_{p\in{P}}^{}\frac{m_p(y_s - y_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + u_y\right] - u_x^2 - u_y^2\]
 
-This give us the following co-state evolution equations by using $\mathbf{p}' = \frac{DH}{D\mathbf{x}}$
+This give us the following co-state evolution equations by using $\mathbf{p}' = -\frac{DH}{D\mathbf{x}}$
 \begin{align*}
-    \dot{p}_1 &= p_3G[\sum_{p\in{P}}^{}\frac{m_p}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} - \frac{3m_p(x_s - x_p)^2}{((x_s-x_p)^2+(y_s-y_p)^2)^{5/2}}] \\
-    \dot{p}_2 &= p_4G[\sum_{p\in{P}}^{}\frac{m_p}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} - \frac{3m_p(y_s - y_p)^2}{((x_s-x_p)^2+(y_s-y_p)^2)^{5/2}}] \\
+    \dot{p}_1 &= p_3G\left(\sum_{p\in{P}}^{}\frac{m_p}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} - \frac{3m_p(x_s - x_p)^2}{((x_s-x_p)^2+(y_s-y_p)^2)^{5/2}}\right) \\
+    \dot{p}_2 &= p_4G\left(\sum_{p\in{P}}^{}\frac{m_p}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} - \frac{3m_p(y_s - y_p)^2}{((x_s-x_p)^2+(y_s-y_p)^2)^{5/2}}\right) \\
     \dot{p}_3 &= -p_1 \\
     \dot{p}_4 &= -p_2. \\
     p_1&(t_f)= p_2(t_f) = 0 = p_3(t_f) = p_4(t_f)
 \end{align*}
-Now we need to find $\tilde{\mathbf{u}}$ by maximizing the Hamiltonian which gives us the following
+Now we need to find $\tilde{\mathbf{u}}$ by maximizing the Hamiltonian i.e. $\frac{DH}{D\mathbf{u}} = 0$.
+\[\frac{\partial H}{\partial u_x} = p_3 - 2u_x \:\:\text{and}\:\: \frac{\partial H}{\partial u_y} = p_4 - 2u_y\]
+now solving for $u_x$ and $u_y$ we get
 \[\tilde{u}_x = \frac{p_3}{2} \:\:\text{and}\:\: \tilde{u}_y = \frac{p_4}{2}.\]
+Plugging $\tilde{u}_x$ and $\tilde{u}_y$ back into the state and costate evolution equations we get the following boundary value problem.
 
+\begin{align*}
+    \dot{x}_s &= \dot{x}_s \\
+    \dot{y}_s &= \dot{y}_s \\
+    \ddot{x}_s &= -G\sum_{p\in{P}}^{}\frac{m_p(x_s - x_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + \frac{p_3}{2} \\
+    \ddot{y}_s &= -G\sum_{p\in{P}}^{}\frac{m_p(y_s - y_p)}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} + \frac{p_4}{2} \\
+    \dot{p}_1 &= p_3G\left(\sum_{p\in{P}}^{}\frac{m_p}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} - \frac{3m_p(x_s - x_p)^2}{((x_s-x_p)^2+(y_s-y_p)^2)^{5/2}}\right) \\
+    \dot{p}_2 &= p_4G\left(\sum_{p\in{P}}^{}\frac{m_p}{((x_s-x_p)^2+(y_s-y_p)^2)^{3/2}} - \frac{3m_p(y_s - y_p)^2}{((x_s-x_p)^2+(y_s-y_p)^2)^{5/2}}\right) \\
+    \dot{p}_3 &= -p_1 \\
+    \dot{p}_4 &= -p_2. \\
+\end{align*}
+With boundary conditions
+\[x_s(t_0) = x_{p_1}(t_0),\:y_s = y_{p_1}(t_0),\:\dot{x}_s(t_0) = \dot{x}_{p_1}(t_0),\:\dot{y}_s(t_0) = \dot{y}_{p_1}(t_0)\]
+and 
+\[x_s(t_f) = x_{p_2}(t_f),\:y_s = y_{p_2}(t_f),\:\dot{x}_s(t_f) = \dot{x}_{p_2}(t_f),\:\dot{y}_s(t_f) = \dot{y}_{p_2}(t_f)\]
+if we are optimizing over $t_f$ we get the added boundary condition that $H(t_f) = 0$, and if we are optimizing over $t_0$ we get $H(t_0)=0$. This problem is now set up to use \lstinline{solve_bvp}.
 
-The system of differential equations is now set up by plugging $u_x$ and $u_y$ back into the evolution equation. This problem is now set up to use \lstinline{solve_bvp}.
-
-\section{Planetary Motion}
+\section{Solution}
 Our first task was figuring out how to insert planets into our system. We needed to have have a time dependent function that would give us the planet's position and velocity. 
 
-\section{Goals}
+\subsection{Goals}
 We hope to acheive an optimal path from Caladan to Arrakis with a fixed final time, a free final time where we need $H(t_f) = 0$ as an added boundary condition, and an optimal control
 with multiple solar systems and planets. We also want to figure out the best path with a given arbitrary layout for a given solar system. Essentially the Spacing Guild would like to use 
 our algorithms to help navigate from any planet. \textcolor{red}{TODO} should we talk about optimizing over $t_0$ if so we should say. We realize that in planetary travel we would like to 
@@ -105,7 +122,7 @@ get to a given planet on a fixed day and then leave our leaving day free. That w
 $H(t_0) = 0$.
 
 
-\section{Simulations}
+\subsection{Simulations}
 We simulated our model using the inner planets of our own solar system, but changed the names to be planets from the \textbf{Dune} universe so the Guild Naviators wouldn't be confused.
 The first model we ran was without the sun and a fixed final time of $200$ Earth days (See Figure \ref{fig:fixed_time_no_sun}). 
 
@@ -145,6 +162,10 @@ optimal control completely changes. We believe that the control with the sun is 
     \caption{Stability with the sun}
     \label{fig:fixed_time_sun_good}
 \end{figure}
+
+Another problem we ran into was our units of time. Our class for planets was giving us the position of the planet in Earth years at the beginning so we thought were telling our model to get from Caladan to Arrakis in $\frac{1}{2}$ a year
+by giving its final time as $\frac{1}{2}$. This was giving us an optimal control and speed that was inconceivable
+
 
 
 
