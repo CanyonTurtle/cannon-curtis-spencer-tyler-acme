@@ -168,3 +168,8 @@ vol-4/Rough_Draft.aux
 vol-4/Rough_Draft.fdb_latexmk
 vol-4/Rough_Draft.fls
 vol-4/Rough_Draft.synctex.gz
+
+*.aux
+*.fls
+*.synctex.gz
+*.fdb_latexmk
