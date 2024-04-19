@@ -76,12 +76,12 @@ In order to represent the angle evolution over time, we used a state space model
 \[\mathbf{x}_t = \begin{pmatrix*}[l]
     \theta_t \\
     \theta_{t-1} \\
-    \theta'
+    \theta'_t
 \end{pmatrix*},\;  
 F = \begin{pmatrix*}[l]
-    1 & 0 & \Delta t \\
-    1 & 0 & 0 \\
-    \frac{1}{\Delta t} & \frac{1}{\Delta t} & 0
+    1 & \phantom{-}0 & \Delta t \\
+    1 & \phantom{-}0 & 0 \\
+    \frac{1}{\Delta t} & -\frac{1}{\Delta t} & 0
 \end{pmatrix*},\;
 H = \begin{pmatrix*}[l]
     1 & 0 & 0 \\
