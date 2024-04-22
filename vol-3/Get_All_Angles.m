@@ -122,35 +122,35 @@ writematrix(est,CSV_name_one_angs)
 % end
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% %% Plot
-% close all
-% 
-% subplot(2,1,1)
-% surf(DOA_Surf_xc')
-% shading interp
-% colormap jet
-% view(0,90)
-% xlim([1 nBlocks]); ylim([1 360]);
-% title('Differential XC')
-% ylabel('Degrees');
-% 
-% subplot(2,1,2)
-% surf(DOA_Surf')
-% shading interp
-% colormap jet
-% view(0,90)
-% xlim([1 nBlocks]); ylim([1 360]);
-% title('GCC PHAT')
-% ylabel('Degrees'); xlabel('Block Number')
-% 
-% sgtitle('Comparison of Continuous Metrics')
-% set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.1, 0.1, 0.65, 0.75]);
-% 
-% plot(lgs_control,R_control/max(abs(R_control)))
-% hold on
-% plot(lgs,R/max(abs(R)));
-% xlim([-50 50])
-% grid on
+%% Plot
+close all
+
+subplot(2,1,1)
+surf(DOA_Surf_xc')
+shading interp
+colormap jet
+view(0,90)
+xlim([1 nBlocks]); ylim([1 360]);
+title('Differential XC')
+ylabel('Degrees');
+
+subplot(2,1,2)
+surf(DOA_Surf')
+shading interp
+colormap jet
+view(0,90)
+xlim([1 nBlocks]); ylim([1 360]);
+title('GCC PHAT')
+ylabel('Degrees'); xlabel('Block Number')
+
+sgtitle('Comparison of Continuous Metrics')
+set(gcf, 'Units', 'Normalized', 'OuterPosition', [0.1, 0.1, 0.65, 0.75]);
+
+plot(lgs_control,R_control/max(abs(R_control)))
+hold on
+plot(lgs,R/max(abs(R)));
+xlim([-50 50])
+grid on
 
 %% Functions
 function angularIndex=getAngularIndex_GPHAT(micpos,fs,bufferSize)
